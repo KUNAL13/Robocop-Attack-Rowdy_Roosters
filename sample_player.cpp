@@ -685,6 +685,11 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     }
 
     //----------XX------------//
+    //If you have taken attack, you will have comment out the attach functions are replace
+    //them with your own, similarly if you have taken defense, you need to comment out the existing
+    //defence function and replace it with your own.
+    //------------xx------------//
+
 
     //ATTACK STARTS HERE
     // I have the ball, what to do?
@@ -694,7 +699,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
                        
     }
 
-    //This is for off the ball movement.
+    //This is for off the ball movement which attacking, where to go for passes etc.
     else if (!kickable && !Opponenthasball)
     {   
         doMove(this);
@@ -707,7 +712,8 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     else
     {
         //Uncomment this for defense.
-        /*if (kickable && Opponenthasball){
+        //If I can kick the ball, but opponent has it. Common ball.
+        if (kickable && Opponenthasball){
             if ( Bhv_ChainAction().execute( agent ) )
             {
                 dlog.addText( Logger::TEAM,
@@ -720,9 +726,12 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
             return true;
 
             }
+
+        // I don't have the ball, opponent has it, off the ball movement while defending.
+        //falling back etc.     
         else if (!kickable && Opponenthasball){
             Bhv_BasicMove().execute(agent);
-        }*/
+        }
         return true;
     };
 
