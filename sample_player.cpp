@@ -1,4 +1,3 @@
-// -*-c++-*-
 
 /*
  *Copyright:
@@ -333,6 +332,7 @@ SamplePlayer::actionImpl()
 
         if ( kickable )
         {
+		printf("asfasfa");
             //Bhv_BasicMove().execute(this);
             Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
@@ -363,8 +363,6 @@ SamplePlayer::actionImpl()
     //
     // other set play mode
     //
-    Bhv_SetPlay().execute( this );
-    return;
 
     if(role_name=="Sample"){
         executeSampleRole(this);
@@ -690,21 +688,27 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //defence function and replace it with your own.
     //------------xx------------//
 
-
-    //ATTACK STARTS HERE
+   
     // I have the ball, what to do?
-    if ( kickable && !Opponenthasball)
-    {
-        doKick( this);
-                       
+  //   const PlayerPtrCont & team = wm.teammatesFromSelf();
+ //    const PlayerObject * nearest_team=team.front();
+	if ( kickable && !Opponenthasball)
+    {printf("\nFirst@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");   
+     //  doKick( this);
+         Body_SmartKick( Vector2D(-1000,0),
+                    10,
+                    10 * 0.96,
+                    1 ).execute( agent );
     }
 
     //This is for off the ball movement which attacking, where to go for passes etc.
     else if (!kickable && !Opponenthasball)
-    {   
+    {    printf("\nSecond");   
+              
         doMove(this);
         return true;
     } 
+
     //ATTACK ENDS HERE
     //--------XX----------XX--------//
     // DEFENCE STARTS HERE
@@ -721,7 +725,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
             agent->debugClient().addMessage( "ChainAction" );
             return true;
             }
-
+		 printf("akandvjna");             
             Bhv_BasicOffensiveKick().execute( agent );
             return true;
 
@@ -1197,7 +1201,7 @@ SamplePlayer::doPreprocess()
     // ball search
     // check queued intention
     // check simultaneous kick
-
+	
     const WorldModel & wm = this->world();
 
     dlog.addText( Logger::TEAM,
