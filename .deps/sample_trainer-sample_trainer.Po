@@ -1,87 +1,88 @@
-sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
- sample_trainer.h /usr/local/include/rcsc/trainer/trainer_agent.h \
+sample_trainer-sample_trainer.o: sample_trainer.cpp \
+ /usr/include/stdc-predef.h ../config.h sample_trainer.h \
+ /usr/local/include/rcsc/trainer/trainer_agent.h \
  /usr/local/include/rcsc/trainer/trainer_config.h \
- /usr/include/c++/4.7/string \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++config.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/os_defines.h \
- /usr/include/features.h /usr/include/stdc-predef.h \
- /usr/include/x86_64-linux-gnu/bits/predefs.h \
- /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/c++/4.8/string \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++config.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/os_defines.h \
+ /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/cpu_defines.h \
- /usr/include/c++/4.7/bits/stringfwd.h \
- /usr/include/c++/4.7/bits/char_traits.h \
- /usr/include/c++/4.7/bits/stl_algobase.h \
- /usr/include/c++/4.7/bits/functexcept.h \
- /usr/include/c++/4.7/bits/exception_defines.h \
- /usr/include/c++/4.7/bits/cpp_type_traits.h \
- /usr/include/c++/4.7/ext/type_traits.h \
- /usr/include/c++/4.7/ext/numeric_traits.h \
- /usr/include/c++/4.7/bits/stl_pair.h /usr/include/c++/4.7/bits/move.h \
- /usr/include/c++/4.7/bits/concept_check.h \
- /usr/include/c++/4.7/bits/stl_iterator_base_types.h \
- /usr/include/c++/4.7/bits/stl_iterator_base_funcs.h \
- /usr/include/c++/4.7/bits/stl_iterator.h \
- /usr/include/c++/4.7/debug/debug.h /usr/include/c++/4.7/bits/postypes.h \
- /usr/include/c++/4.7/cwchar /usr/include/wchar.h /usr/include/stdio.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdarg.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/cpu_defines.h \
+ /usr/include/c++/4.8/bits/stringfwd.h \
+ /usr/include/c++/4.8/bits/memoryfwd.h \
+ /usr/include/c++/4.8/bits/char_traits.h \
+ /usr/include/c++/4.8/bits/stl_algobase.h \
+ /usr/include/c++/4.8/bits/functexcept.h \
+ /usr/include/c++/4.8/bits/exception_defines.h \
+ /usr/include/c++/4.8/bits/cpp_type_traits.h \
+ /usr/include/c++/4.8/ext/type_traits.h \
+ /usr/include/c++/4.8/ext/numeric_traits.h \
+ /usr/include/c++/4.8/bits/stl_pair.h /usr/include/c++/4.8/bits/move.h \
+ /usr/include/c++/4.8/bits/concept_check.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_types.h \
+ /usr/include/c++/4.8/bits/stl_iterator_base_funcs.h \
+ /usr/include/c++/4.8/debug/debug.h \
+ /usr/include/c++/4.8/bits/stl_iterator.h \
+ /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
+ /usr/include/wchar.h /usr/include/stdio.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/stddef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h \
  /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/wchar2.h \
- /usr/include/c++/4.7/bits/allocator.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++allocator.h \
- /usr/include/c++/4.7/ext/new_allocator.h /usr/include/c++/4.7/new \
- /usr/include/c++/4.7/exception \
- /usr/include/c++/4.7/bits/atomic_lockfree_defines.h \
- /usr/include/c++/4.7/bits/localefwd.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++locale.h \
- /usr/include/c++/4.7/clocale /usr/include/locale.h \
- /usr/include/x86_64-linux-gnu/bits/locale.h /usr/include/c++/4.7/iosfwd \
- /usr/include/c++/4.7/cctype /usr/include/ctype.h \
+ /usr/include/c++/4.8/bits/allocator.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h \
+ /usr/include/c++/4.8/ext/new_allocator.h /usr/include/c++/4.8/new \
+ /usr/include/c++/4.8/exception \
+ /usr/include/c++/4.8/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/4.8/bits/localefwd.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++locale.h \
+ /usr/include/c++/4.8/clocale /usr/include/locale.h \
+ /usr/include/x86_64-linux-gnu/bits/locale.h /usr/include/c++/4.8/iosfwd \
+ /usr/include/c++/4.8/cctype /usr/include/ctype.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
  /usr/include/x86_64-linux-gnu/bits/typesizes.h /usr/include/endian.h \
  /usr/include/x86_64-linux-gnu/bits/endian.h \
  /usr/include/x86_64-linux-gnu/bits/byteswap.h \
  /usr/include/x86_64-linux-gnu/bits/byteswap-16.h \
- /usr/include/c++/4.7/bits/ostream_insert.h \
- /usr/include/c++/4.7/bits/cxxabi_forced.h \
- /usr/include/c++/4.7/bits/stl_function.h \
- /usr/include/c++/4.7/backward/binders.h \
- /usr/include/c++/4.7/bits/range_access.h \
- /usr/include/c++/4.7/bits/basic_string.h \
- /usr/include/c++/4.7/ext/atomicity.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/gthr.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/gthr-default.h \
+ /usr/include/c++/4.8/bits/ostream_insert.h \
+ /usr/include/c++/4.8/bits/cxxabi_forced.h \
+ /usr/include/c++/4.8/bits/stl_function.h \
+ /usr/include/c++/4.8/backward/binders.h \
+ /usr/include/c++/4.8/bits/range_access.h \
+ /usr/include/c++/4.8/bits/basic_string.h \
+ /usr/include/c++/4.8/ext/atomicity.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/gthr.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/gthr-default.h \
  /usr/include/pthread.h /usr/include/sched.h /usr/include/time.h \
  /usr/include/x86_64-linux-gnu/bits/sched.h \
  /usr/include/x86_64-linux-gnu/bits/time.h \
  /usr/include/x86_64-linux-gnu/bits/timex.h \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/atomic_word.h \
- /usr/include/c++/4.7/bits/basic_string.tcc \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/atomic_word.h \
+ /usr/include/c++/4.8/bits/basic_string.tcc \
  /usr/local/include/rcsc/coach/global_world_model.h \
  /usr/local/include/rcsc/coach/global_object.h \
  /usr/local/include/rcsc/common/player_type.h \
  /usr/local/include/rcsc/geom/vector_2d.h \
- /usr/local/include/rcsc/geom/angle_deg.h /usr/include/c++/4.7/functional \
- /usr/include/c++/4.7/iostream /usr/include/c++/4.7/ostream \
- /usr/include/c++/4.7/ios /usr/include/c++/4.7/bits/ios_base.h \
- /usr/include/c++/4.7/bits/locale_classes.h \
- /usr/include/c++/4.7/bits/locale_classes.tcc \
- /usr/include/c++/4.7/streambuf /usr/include/c++/4.7/bits/streambuf.tcc \
- /usr/include/c++/4.7/bits/basic_ios.h \
- /usr/include/c++/4.7/bits/locale_facets.h /usr/include/c++/4.7/cwctype \
+ /usr/local/include/rcsc/geom/angle_deg.h /usr/include/c++/4.8/functional \
+ /usr/include/c++/4.8/iostream /usr/include/c++/4.8/ostream \
+ /usr/include/c++/4.8/ios /usr/include/c++/4.8/bits/ios_base.h \
+ /usr/include/c++/4.8/bits/locale_classes.h \
+ /usr/include/c++/4.8/bits/locale_classes.tcc \
+ /usr/include/c++/4.8/streambuf /usr/include/c++/4.8/bits/streambuf.tcc \
+ /usr/include/c++/4.8/bits/basic_ios.h \
+ /usr/include/c++/4.8/bits/locale_facets.h /usr/include/c++/4.8/cwctype \
  /usr/include/wctype.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/ctype_base.h \
- /usr/include/c++/4.7/bits/streambuf_iterator.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/ctype_inline.h \
- /usr/include/c++/4.7/bits/locale_facets.tcc \
- /usr/include/c++/4.7/bits/basic_ios.tcc \
- /usr/include/c++/4.7/bits/ostream.tcc /usr/include/c++/4.7/istream \
- /usr/include/c++/4.7/bits/istream.tcc /usr/include/c++/4.7/cmath \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/ctype_base.h \
+ /usr/include/c++/4.8/bits/streambuf_iterator.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/ctype_inline.h \
+ /usr/include/c++/4.8/bits/locale_facets.tcc \
+ /usr/include/c++/4.8/bits/basic_ios.tcc \
+ /usr/include/c++/4.8/bits/ostream.tcc /usr/include/c++/4.8/istream \
+ /usr/include/c++/4.8/bits/istream.tcc /usr/include/c++/4.8/cmath \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/huge_val.h \
  /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
  /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
@@ -96,9 +97,9 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/config/select_compiler_config.hpp \
  /usr/include/boost/config/compiler/gcc.hpp \
  /usr/include/boost/config/select_stdlib_config.hpp \
- /usr/include/c++/4.7/cstddef \
+ /usr/include/c++/4.8/cstddef \
  /usr/include/boost/config/no_tr1/utility.hpp \
- /usr/include/c++/4.7/utility /usr/include/c++/4.7/bits/stl_relops.h \
+ /usr/include/c++/4.8/utility /usr/include/c++/4.8/bits/stl_relops.h \
  /usr/include/boost/config/stdlib/libstdcpp3.hpp /usr/include/unistd.h \
  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
  /usr/include/x86_64-linux-gnu/bits/environments.h \
@@ -106,7 +107,7 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/x86_64-linux-gnu/bits/unistd.h \
  /usr/include/boost/config/select_platform_config.hpp \
  /usr/include/boost/config/platform/linux.hpp \
- /usr/include/c++/4.7/cstdlib /usr/include/stdlib.h \
+ /usr/include/c++/4.8/cstdlib /usr/include/stdlib.h \
  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
@@ -115,29 +116,30 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/x86_64-linux-gnu/bits/sigset.h \
  /usr/include/x86_64-linux-gnu/bits/select2.h \
  /usr/include/x86_64-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib.h \
  /usr/include/boost/config/posix_features.hpp \
  /usr/include/boost/config/suffix.hpp \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdint.h /usr/include/stdint.h \
- /usr/local/include/rcsc/soccer_math.h /usr/include/c++/4.7/map \
- /usr/include/c++/4.7/bits/stl_tree.h /usr/include/c++/4.7/bits/stl_map.h \
- /usr/include/c++/4.7/bits/stl_multimap.h /usr/include/c++/4.7/vector \
- /usr/include/c++/4.7/bits/stl_construct.h \
- /usr/include/c++/4.7/ext/alloc_traits.h \
- /usr/include/c++/4.7/bits/stl_uninitialized.h \
- /usr/include/c++/4.7/bits/stl_vector.h \
- /usr/include/c++/4.7/bits/stl_bvector.h \
- /usr/include/c++/4.7/bits/vector.tcc /usr/include/c++/4.7/list \
- /usr/include/c++/4.7/bits/stl_list.h /usr/include/c++/4.7/bits/list.tcc \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdint.h /usr/include/stdint.h \
+ /usr/local/include/rcsc/soccer_math.h /usr/include/c++/4.8/map \
+ /usr/include/c++/4.8/bits/stl_tree.h /usr/include/c++/4.8/bits/stl_map.h \
+ /usr/include/c++/4.8/bits/stl_multimap.h /usr/include/c++/4.8/vector \
+ /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/include/c++/4.8/ext/alloc_traits.h \
+ /usr/include/c++/4.8/bits/stl_uninitialized.h \
+ /usr/include/c++/4.8/bits/stl_vector.h \
+ /usr/include/c++/4.8/bits/stl_bvector.h \
+ /usr/include/c++/4.8/bits/vector.tcc /usr/include/c++/4.8/list \
+ /usr/include/c++/4.8/bits/stl_list.h /usr/include/c++/4.8/bits/list.tcc \
  /usr/local/include/rcsc/coach/player_type_analyzer.h \
  /usr/local/include/rcsc/game_time.h /usr/local/include/rcsc/game_mode.h \
  /usr/include/boost/shared_ptr.hpp \
  /usr/include/boost/smart_ptr/shared_ptr.hpp \
- /usr/include/boost/config/no_tr1/memory.hpp /usr/include/c++/4.7/memory \
- /usr/include/c++/4.7/bits/stl_tempbuf.h \
- /usr/include/c++/4.7/bits/stl_raw_storage_iter.h \
- /usr/include/c++/4.7/backward/auto_ptr.h /usr/include/boost/assert.hpp \
+ /usr/include/boost/config/no_tr1/memory.hpp /usr/include/c++/4.8/memory \
+ /usr/include/c++/4.8/bits/stl_tempbuf.h \
+ /usr/include/c++/4.8/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/4.8/backward/auto_ptr.h /usr/include/boost/assert.hpp \
  /usr/include/assert.h /usr/include/boost/current_function.hpp \
  /usr/include/boost/checked_delete.hpp \
  /usr/include/boost/throw_exception.hpp \
@@ -149,32 +151,33 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/smart_ptr/detail/sp_counted_base.hpp \
  /usr/include/boost/smart_ptr/detail/sp_has_sync.hpp \
  /usr/include/boost/smart_ptr/detail/sp_counted_base_gcc_x86.hpp \
- /usr/include/boost/detail/sp_typeinfo.hpp /usr/include/c++/4.7/typeinfo \
+ /usr/include/boost/detail/sp_typeinfo.hpp /usr/include/c++/4.8/typeinfo \
  /usr/include/boost/smart_ptr/detail/sp_counted_impl.hpp \
  /usr/include/boost/smart_ptr/detail/sp_convertible.hpp \
+ /usr/include/boost/smart_ptr/detail/sp_nullptr_t.hpp \
  /usr/include/boost/smart_ptr/detail/spinlock_pool.hpp \
  /usr/include/boost/smart_ptr/detail/spinlock.hpp \
  /usr/include/boost/smart_ptr/detail/spinlock_sync.hpp \
  /usr/include/boost/smart_ptr/detail/yield_k.hpp \
- /usr/include/boost/memory_order.hpp /usr/include/c++/4.7/algorithm \
- /usr/include/c++/4.7/bits/stl_algo.h \
- /usr/include/c++/4.7/bits/algorithmfwd.h \
- /usr/include/c++/4.7/bits/stl_heap.h \
+ /usr/include/boost/memory_order.hpp /usr/include/c++/4.8/algorithm \
+ /usr/include/c++/4.8/bits/stl_algo.h \
+ /usr/include/c++/4.8/bits/algorithmfwd.h \
+ /usr/include/c++/4.8/bits/stl_heap.h \
  /usr/include/boost/smart_ptr/detail/operator_bool.hpp \
  /usr/local/include/rcsc/common/soccer_agent.h \
  /usr/include/boost/scoped_ptr.hpp \
  /usr/include/boost/smart_ptr/scoped_ptr.hpp \
  /usr/local/include/rcsc/trainer/trainer_command.h \
  /usr/local/include/rcsc/common/basic_client.h \
- /usr/include/c++/4.7/fstream /usr/include/c++/4.7/bits/codecvt.h \
- /usr/include/c++/4.7/cstdio /usr/include/libio.h \
+ /usr/include/c++/4.8/fstream /usr/include/c++/4.8/bits/codecvt.h \
+ /usr/include/c++/4.8/cstdio /usr/include/libio.h \
  /usr/include/_G_config.h /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
  /usr/include/x86_64-linux-gnu/bits/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio2.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/basic_file.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++io.h \
- /usr/include/c++/4.7/bits/fstream.tcc \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/basic_file.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/c++io.h \
+ /usr/include/c++/4.8/bits/fstream.tcc \
  /usr/local/include/rcsc/common/player_param.h \
  /usr/local/include/rcsc/common/server_param.h \
  /usr/local/include/rcsc/geom/rect_2d.h \
@@ -183,17 +186,17 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/local/include/rcsc/geom/line_2d.h \
  /usr/local/include/rcsc/math_util.h \
  /usr/local/include/rcsc/param/param_map.h \
- /usr/include/boost/lexical_cast.hpp /usr/include/c++/4.7/climits \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/limits.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/syslimits.h \
+ /usr/include/boost/lexical_cast.hpp /usr/include/c++/4.8/climits \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed/syslimits.h \
  /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
  /usr/include/linux/limits.h \
  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
- /usr/include/c++/4.7/cstring /usr/include/string.h \
+ /usr/include/c++/4.8/cstring /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h \
- /usr/include/boost/limits.hpp /usr/include/c++/4.7/limits \
+ /usr/include/boost/limits.hpp /usr/include/c++/4.8/limits \
  /usr/include/boost/mpl/if.hpp /usr/include/boost/mpl/aux_/value_wknd.hpp \
  /usr/include/boost/mpl/aux_/static_cast.hpp \
  /usr/include/boost/mpl/aux_/config/workaround.hpp \
@@ -271,6 +274,12 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/preprocessor/arithmetic/sub.hpp \
  /usr/include/boost/mpl/aux_/config/overload_resolution.hpp \
  /usr/include/boost/mpl/aux_/lambda_support.hpp \
+ /usr/include/boost/type_traits/ice.hpp \
+ /usr/include/boost/type_traits/detail/yes_no_type.hpp \
+ /usr/include/boost/type_traits/detail/ice_or.hpp \
+ /usr/include/boost/type_traits/detail/ice_and.hpp \
+ /usr/include/boost/type_traits/detail/ice_not.hpp \
+ /usr/include/boost/type_traits/detail/ice_eq.hpp \
  /usr/include/boost/type_traits/is_pointer.hpp \
  /usr/include/boost/type_traits/is_member_pointer.hpp \
  /usr/include/boost/type_traits/config.hpp \
@@ -287,19 +296,37 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/mpl/integral_c.hpp \
  /usr/include/boost/mpl/integral_c_fwd.hpp \
  /usr/include/boost/type_traits/detail/bool_trait_undef.hpp \
- /usr/include/boost/type_traits/detail/ice_and.hpp \
- /usr/include/boost/type_traits/detail/ice_not.hpp \
- /usr/include/boost/type_traits/is_integral.hpp \
- /usr/include/boost/type_traits/is_arithmetic.hpp \
- /usr/include/boost/type_traits/is_float.hpp \
- /usr/include/boost/type_traits/detail/ice_or.hpp \
- /usr/include/boost/type_traits/remove_pointer.hpp \
+ /usr/include/boost/static_assert.hpp \
+ /usr/include/boost/detail/lcast_precision.hpp \
+ /usr/include/boost/integer_traits.hpp \
+ /usr/include/boost/type_traits/is_abstract.hpp \
+ /usr/include/boost/type_traits/intrinsics.hpp \
+ /usr/include/boost/type_traits/is_same.hpp \
+ /usr/include/boost/type_traits/is_reference.hpp \
+ /usr/include/boost/type_traits/is_lvalue_reference.hpp \
+ /usr/include/boost/type_traits/is_rvalue_reference.hpp \
+ /usr/include/boost/type_traits/is_volatile.hpp \
+ /usr/include/c++/4.8/locale \
+ /usr/include/c++/4.8/bits/locale_facets_nonio.h \
+ /usr/include/c++/4.8/ctime \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/time_members.h \
+ /usr/include/x86_64-linux-gnu/c++/4.8/bits/messages_members.h \
+ /usr/include/libintl.h /usr/include/c++/4.8/bits/locale_facets_nonio.tcc \
+ /usr/include/c++/4.8/sstream /usr/include/c++/4.8/bits/sstream.tcc \
+ /usr/include/boost/array.hpp /usr/include/c++/4.8/stdexcept \
+ /usr/include/boost/swap.hpp /usr/include/boost/utility/swap.hpp \
+ /usr/include/boost/detail/iterator.hpp /usr/include/c++/4.8/iterator \
+ /usr/include/c++/4.8/bits/stream_iterator.h \
+ /usr/include/boost/functional/hash_fwd.hpp \
+ /usr/include/boost/functional/hash/hash_fwd.hpp \
  /usr/include/boost/numeric/conversion/cast.hpp \
  /usr/include/boost/type.hpp \
  /usr/include/boost/numeric/conversion/converter.hpp \
  /usr/include/boost/numeric/conversion/conversion_traits.hpp \
  /usr/include/boost/numeric/conversion/detail/conversion_traits.hpp \
- /usr/include/boost/type_traits/is_same.hpp \
+ /usr/include/boost/type_traits/is_arithmetic.hpp \
+ /usr/include/boost/type_traits/is_integral.hpp \
+ /usr/include/boost/type_traits/is_float.hpp \
  /usr/include/boost/numeric/conversion/detail/meta.hpp \
  /usr/include/boost/mpl/eval_if.hpp /usr/include/boost/mpl/equal_to.hpp \
  /usr/include/boost/mpl/aux_/comparison_op.hpp \
@@ -360,38 +387,42 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/numeric/conversion/detail/numeric_cast_traits.hpp \
  /usr/include/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_common.hpp \
  /usr/include/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_long_long.hpp \
- /usr/include/boost/type_traits/ice.hpp \
- /usr/include/boost/type_traits/detail/yes_no_type.hpp \
- /usr/include/boost/type_traits/detail/ice_eq.hpp \
  /usr/include/boost/type_traits/make_unsigned.hpp \
  /usr/include/boost/type_traits/is_signed.hpp \
  /usr/include/boost/type_traits/is_enum.hpp \
- /usr/include/boost/type_traits/intrinsics.hpp \
- /usr/include/boost/type_traits/is_reference.hpp \
- /usr/include/boost/type_traits/is_lvalue_reference.hpp \
- /usr/include/boost/type_traits/is_rvalue_reference.hpp \
- /usr/include/boost/type_traits/is_volatile.hpp \
  /usr/include/boost/type_traits/is_unsigned.hpp \
  /usr/include/boost/type_traits/is_const.hpp \
  /usr/include/boost/type_traits/add_const.hpp \
  /usr/include/boost/type_traits/add_volatile.hpp \
- /usr/include/boost/static_assert.hpp \
+ /usr/include/boost/type_traits/remove_pointer.hpp \
+ /usr/include/boost/type_traits/has_left_shift.hpp \
+ /usr/include/boost/type_traits/detail/has_binary_operator.hpp \
+ /usr/include/boost/type_traits/is_base_of.hpp \
+ /usr/include/boost/type_traits/is_base_and_derived.hpp \
+ /usr/include/boost/type_traits/is_class.hpp \
+ /usr/include/boost/type_traits/is_convertible.hpp \
+ /usr/include/boost/type_traits/is_array.hpp \
+ /usr/include/boost/type_traits/is_void.hpp \
+ /usr/include/boost/type_traits/add_lvalue_reference.hpp \
+ /usr/include/boost/type_traits/add_reference.hpp \
+ /usr/include/boost/type_traits/add_rvalue_reference.hpp \
+ /usr/include/boost/type_traits/is_function.hpp \
+ /usr/include/boost/type_traits/detail/false_result.hpp \
+ /usr/include/boost/type_traits/detail/is_function_ptr_helper.hpp \
+ /usr/include/boost/type_traits/is_fundamental.hpp \
+ /usr/include/boost/type_traits/remove_reference.hpp \
+ /usr/include/boost/type_traits/has_right_shift.hpp \
  /usr/include/boost/math/special_functions/sign.hpp \
- /usr/include/boost/math/tools/config.hpp \
+ /usr/include/boost/math/tools/config.hpp /usr/include/c++/4.8/cfloat \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h \
  /usr/include/boost/math/tools/user.hpp \
- /usr/include/boost/math/special_functions/detail/round_fwd.hpp \
- /usr/include/boost/detail/fenv.hpp /usr/include/c++/4.7/fenv.h \
+ /usr/include/boost/detail/fenv.hpp /usr/include/c++/4.8/fenv.h \
  /usr/include/fenv.h /usr/include/x86_64-linux-gnu/bits/fenv.h \
  /usr/include/x86_64-linux-gnu/bits/fenvinline.h \
  /usr/include/boost/math/special_functions/math_fwd.hpp \
+ /usr/include/boost/math/special_functions/detail/round_fwd.hpp \
  /usr/include/boost/math/tools/promotion.hpp \
  /usr/include/boost/type_traits/is_floating_point.hpp \
- /usr/include/boost/type_traits/is_convertible.hpp \
- /usr/include/boost/type_traits/is_array.hpp \
- /usr/include/boost/type_traits/add_reference.hpp \
- /usr/include/boost/type_traits/is_void.hpp \
- /usr/include/boost/type_traits/is_abstract.hpp \
- /usr/include/boost/type_traits/add_rvalue_reference.hpp \
  /usr/include/boost/mpl/or.hpp \
  /usr/include/boost/mpl/aux_/preprocessed/gcc/or.hpp \
  /usr/include/boost/math/policies/policy.hpp \
@@ -550,39 +581,85 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/mpl/greater_equal.hpp \
  /usr/include/boost/mpl/aux_/preprocessed/gcc/greater_equal.hpp \
  /usr/include/boost/config/no_tr1/complex.hpp \
- /usr/include/c++/4.7/complex /usr/include/c++/4.7/sstream \
- /usr/include/c++/4.7/bits/sstream.tcc \
+ /usr/include/c++/4.8/complex \
  /usr/include/boost/math/special_functions/detail/fp_traits.hpp \
  /usr/include/boost/detail/endian.hpp \
  /usr/include/boost/math/special_functions/fpclassify.hpp \
  /usr/include/boost/math/tools/real_cast.hpp \
- /usr/include/boost/detail/lcast_precision.hpp \
- /usr/include/boost/integer_traits.hpp \
+ /usr/include/boost/range/iterator_range_core.hpp \
+ /usr/include/boost/iterator/iterator_traits.hpp \
+ /usr/include/boost/iterator/iterator_facade.hpp \
+ /usr/include/boost/iterator.hpp \
+ /usr/include/boost/iterator/interoperable.hpp \
+ /usr/include/boost/iterator/detail/config_def.hpp \
+ /usr/include/boost/iterator/detail/config_undef.hpp \
+ /usr/include/boost/iterator/detail/facade_iterator_category.hpp \
+ /usr/include/boost/iterator/iterator_categories.hpp \
+ /usr/include/boost/detail/indirect_traits.hpp \
+ /usr/include/boost/iterator/detail/enable_if.hpp \
+ /usr/include/boost/utility/addressof.hpp \
+ /usr/include/boost/type_traits/add_pointer.hpp \
+ /usr/include/boost/type_traits/remove_const.hpp \
+ /usr/include/boost/type_traits/is_pod.hpp \
+ /usr/include/boost/type_traits/is_scalar.hpp \
+ /usr/include/boost/range/functions.hpp \
+ /usr/include/boost/range/begin.hpp /usr/include/boost/range/config.hpp \
+ /usr/include/boost/range/iterator.hpp \
+ /usr/include/boost/range/mutable_iterator.hpp \
+ /usr/include/boost/range/detail/extract_optional_type.hpp \
+ /usr/include/boost/range/const_iterator.hpp \
+ /usr/include/boost/range/end.hpp \
+ /usr/include/boost/range/detail/implementation_help.hpp \
+ /usr/include/boost/range/detail/common.hpp \
+ /usr/include/boost/range/detail/sfinae.hpp \
+ /usr/include/boost/range/size.hpp /usr/include/boost/range/size_type.hpp \
+ /usr/include/boost/range/difference_type.hpp \
+ /usr/include/boost/utility/enable_if.hpp \
+ /usr/include/boost/range/distance.hpp /usr/include/boost/range/empty.hpp \
+ /usr/include/boost/range/rbegin.hpp \
+ /usr/include/boost/range/reverse_iterator.hpp \
+ /usr/include/boost/iterator/reverse_iterator.hpp \
+ /usr/include/boost/next_prior.hpp \
+ /usr/include/boost/iterator/iterator_adaptor.hpp \
+ /usr/include/boost/range/rend.hpp \
+ /usr/include/boost/range/algorithm/equal.hpp \
+ /usr/include/boost/range/concepts.hpp \
+ /usr/include/boost/concept_check.hpp \
+ /usr/include/boost/concept/assert.hpp \
+ /usr/include/boost/concept/detail/general.hpp \
+ /usr/include/boost/concept/detail/backward_compatibility.hpp \
+ /usr/include/boost/concept/detail/has_constraints.hpp \
+ /usr/include/boost/type_traits/conversion_traits.hpp \
+ /usr/include/boost/concept/usage.hpp \
+ /usr/include/boost/concept/detail/concept_def.hpp \
+ /usr/include/boost/preprocessor/seq/for_each_i.hpp \
+ /usr/include/boost/preprocessor/repetition/for.hpp \
+ /usr/include/boost/preprocessor/repetition/detail/for.hpp \
+ /usr/include/boost/preprocessor/seq/seq.hpp \
+ /usr/include/boost/preprocessor/seq/elem.hpp \
+ /usr/include/boost/preprocessor/seq/size.hpp \
+ /usr/include/boost/preprocessor/seq/enum.hpp \
+ /usr/include/boost/concept/detail/concept_undef.hpp \
+ /usr/include/boost/iterator/iterator_concepts.hpp \
+ /usr/include/boost/range/value_type.hpp \
+ /usr/include/boost/range/detail/misc_concept.hpp \
+ /usr/include/boost/range/detail/safe_bool.hpp \
  /usr/include/boost/container/container_fwd.hpp \
- /usr/include/c++/4.7/locale \
- /usr/include/c++/4.7/bits/locale_facets_nonio.h \
- /usr/include/c++/4.7/ctime \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/time_members.h \
- /usr/include/x86_64-linux-gnu/c++/4.7/./bits/messages_members.h \
- /usr/include/libintl.h /usr/include/c++/4.7/bits/locale_facets_nonio.tcc \
- /usr/include/c++/4.7/cassert \
+ /usr/include/boost/integer.hpp /usr/include/boost/integer_fwd.hpp \
+ /usr/include/c++/4.8/cassert \
  /usr/local/include/rcsc/param/cmd_line_parser.h \
- /usr/local/include/rcsc/param/param_parser.h /usr/include/c++/4.7/set \
- /usr/include/c++/4.7/bits/stl_set.h \
- /usr/include/c++/4.7/bits/stl_multiset.h \
+ /usr/local/include/rcsc/param/param_parser.h /usr/include/c++/4.8/set \
+ /usr/include/c++/4.8/bits/stl_set.h \
+ /usr/include/c++/4.8/bits/stl_multiset.h \
  /usr/local/include/rcsc/random.h /usr/include/boost/random.hpp \
  /usr/include/boost/random/additive_combine.hpp \
  /usr/include/boost/random/detail/config.hpp \
  /usr/include/boost/random/detail/operators.hpp \
  /usr/include/boost/random/detail/seed.hpp \
- /usr/include/boost/utility/enable_if.hpp \
  /usr/include/boost/random/linear_congruential.hpp \
- /usr/include/c++/4.7/stdexcept \
  /usr/include/boost/integer/static_log2.hpp \
- /usr/include/boost/integer_fwd.hpp \
  /usr/include/boost/random/detail/const_mod.hpp \
  /usr/include/boost/random/detail/large_arithmetic.hpp \
- /usr/include/boost/integer.hpp \
  /usr/include/boost/random/detail/integer_log2.hpp \
  /usr/include/boost/pending/integer_log2.hpp \
  /usr/include/boost/random/detail/disable_warnings.hpp \
@@ -595,8 +672,6 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/random/independent_bits.hpp \
  /usr/include/boost/random/inversive_congruential.hpp \
  /usr/include/boost/random/lagged_fibonacci.hpp \
- /usr/include/c++/4.7/iterator \
- /usr/include/c++/4.7/bits/stream_iterator.h \
  /usr/include/boost/random/uniform_01.hpp \
  /usr/include/boost/random/detail/ptr_helper.hpp \
  /usr/include/boost/random/detail/generator_seed_seq.hpp \
@@ -610,12 +685,17 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/random/xor_combine.hpp \
  /usr/include/boost/random/generate_canonical.hpp \
  /usr/include/boost/math/special_functions.hpp \
- /usr/include/boost/math/special_functions/acosh.hpp \
- /usr/include/boost/math/tools/precision.hpp /usr/include/c++/4.7/iomanip \
+ /usr/include/boost/math/special_functions/airy.hpp \
+ /usr/include/boost/math/special_functions/bessel.hpp \
+ /usr/include/boost/math/special_functions/detail/bessel_jy.hpp \
+ /usr/include/boost/math/special_functions/gamma.hpp \
+ /usr/include/boost/math/tools/series.hpp \
+ /usr/include/boost/math/tools/fraction.hpp \
+ /usr/include/boost/math/tools/precision.hpp \
  /usr/include/boost/math/policies/error_handling.hpp \
- /usr/include/c++/4.7/cerrno /usr/include/errno.h \
- /usr/include/x86_64-linux-gnu/bits/errno.h /usr/include/linux/errno.h \
- /usr/include/x86_64-linux-gnu/asm/errno.h \
+ /usr/include/c++/4.8/iomanip /usr/include/c++/4.8/cerrno \
+ /usr/include/errno.h /usr/include/x86_64-linux-gnu/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/boost/format.hpp \
  /usr/include/boost/format/detail/compat_workarounds.hpp \
@@ -632,22 +712,15 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/type_traits/detail/size_t_trait_undef.hpp \
  /usr/include/boost/type_traits/has_nothrow_constructor.hpp \
  /usr/include/boost/type_traits/has_trivial_constructor.hpp \
- /usr/include/boost/type_traits/is_pod.hpp \
- /usr/include/boost/type_traits/is_scalar.hpp \
  /usr/include/boost/type_traits/type_with_alignment.hpp \
  /usr/include/boost/preprocessor/list/for_each_i.hpp \
- /usr/include/boost/preprocessor/repetition/for.hpp \
- /usr/include/boost/preprocessor/repetition/detail/for.hpp \
  /usr/include/boost/preprocessor/tuple/to_list.hpp \
  /usr/include/boost/preprocessor/list/transform.hpp \
  /usr/include/boost/preprocessor/list/append.hpp \
- /usr/include/boost/type_traits/remove_reference.hpp \
  /usr/include/boost/detail/reference_content.hpp \
  /usr/include/boost/type_traits/has_nothrow_copy.hpp \
  /usr/include/boost/type_traits/has_trivial_copy.hpp \
  /usr/include/boost/none.hpp /usr/include/boost/none_t.hpp \
- /usr/include/boost/utility/swap.hpp \
- /usr/include/boost/utility/addressof.hpp \
  /usr/include/boost/utility/compare_pointees.hpp \
  /usr/include/boost/utility/in_place_factory.hpp \
  /usr/include/boost/utility/detail/in_place_factory_prefix.hpp \
@@ -676,30 +749,23 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/format/parsing.hpp \
  /usr/include/boost/format/free_funcs.hpp \
  /usr/include/boost/format/detail/unset_macros.hpp \
+ /usr/include/boost/math/constants/constants.hpp \
+ /usr/include/boost/math/constants/calculate_constants.hpp \
+ /usr/include/boost/math/special_functions/trunc.hpp \
  /usr/include/boost/math/special_functions/log1p.hpp \
- /usr/include/boost/math/tools/series.hpp \
- /usr/include/boost/math/tools/rational.hpp /usr/include/boost/array.hpp \
- /usr/include/boost/swap.hpp /usr/include/boost/detail/iterator.hpp \
+ /usr/include/boost/math/tools/rational.hpp \
  /usr/include/boost/math/tools/detail/polynomial_horner3_17.hpp \
  /usr/include/boost/math/tools/detail/rational_horner3_17.hpp \
  /usr/include/boost/math/tools/big_constant.hpp \
- /usr/include/boost/math/special_functions/asinh.hpp \
- /usr/include/boost/math/special_functions/sqrt1pm1.hpp \
- /usr/include/boost/math/special_functions/expm1.hpp \
- /usr/include/boost/math/special_functions/atanh.hpp \
- /usr/include/boost/math/special_functions/bessel.hpp \
- /usr/include/boost/math/special_functions/detail/bessel_jy.hpp \
- /usr/include/boost/math/special_functions/gamma.hpp \
- /usr/include/boost/math/tools/fraction.hpp \
- /usr/include/boost/math/constants/constants.hpp \
- /usr/include/boost/math/special_functions/trunc.hpp \
  /usr/include/boost/math/special_functions/powm1.hpp \
+ /usr/include/boost/math/special_functions/expm1.hpp \
+ /usr/include/boost/math/special_functions/sqrt1pm1.hpp \
  /usr/include/boost/math/special_functions/lanczos.hpp \
  /usr/include/boost/math/special_functions/detail/lanczos_sse2.hpp \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/emmintrin.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/xmmintrin.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/mmintrin.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.7/include/mm_malloc.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/emmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/xmmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/mmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/mm_malloc.h \
  /usr/include/boost/math/special_functions/detail/igamma_large.hpp \
  /usr/include/boost/math/special_functions/detail/unchecked_factorial.hpp \
  /usr/include/boost/math/special_functions/detail/lgamma_small.hpp \
@@ -729,7 +795,6 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/fusion/support/detail/access.hpp \
  /usr/include/boost/fusion/iterator/next.hpp \
  /usr/include/boost/fusion/support/tag_of.hpp \
- /usr/include/boost/type_traits/remove_const.hpp \
  /usr/include/boost/fusion/support/tag_of_fwd.hpp \
  /usr/include/boost/fusion/support/detail/is_mpl_sequence.hpp \
  /usr/include/boost/mpl/is_sequence.hpp \
@@ -739,7 +804,6 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/blank.hpp /usr/include/boost/blank_fwd.hpp \
  /usr/include/boost/detail/templated_streams.hpp \
  /usr/include/boost/type_traits/is_empty.hpp \
- /usr/include/boost/type_traits/is_class.hpp \
  /usr/include/boost/type_traits/is_stateless.hpp \
  /usr/include/boost/type_traits/has_trivial_destructor.hpp \
  /usr/include/boost/fusion/sequence/intrinsic_fwd.hpp \
@@ -757,8 +821,6 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/fusion/support/void.hpp \
  /usr/include/boost/fusion/iterator/equal_to.hpp \
  /usr/include/boost/fusion/support/is_iterator.hpp \
- /usr/include/boost/type_traits/is_base_of.hpp \
- /usr/include/boost/type_traits/is_base_and_derived.hpp \
  /usr/include/boost/fusion/sequence/intrinsic/segments.hpp \
  /usr/include/boost/fusion/iterator/segmented_iterator.hpp \
  /usr/include/boost/fusion/iterator/detail/segmented_iterator.hpp \
@@ -880,6 +942,7 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/fusion/sequence/comparison.hpp \
  /usr/include/boost/fusion/sequence/comparison/equal_to.hpp \
  /usr/include/boost/fusion/sequence/comparison/detail/equal_to.hpp \
+ /usr/include/boost/fusion/support/as_const.hpp \
  /usr/include/boost/fusion/sequence/comparison/enable_comparison.hpp \
  /usr/include/boost/fusion/sequence/comparison/greater.hpp \
  /usr/include/boost/fusion/sequence/comparison/less.hpp \
@@ -908,12 +971,7 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/fusion/adapted/struct/adapt_struct.hpp \
  /usr/include/boost/fusion/adapted/struct/detail/extension.hpp \
  /usr/include/boost/fusion/adapted/struct/detail/adapt_base.hpp \
- /usr/include/boost/preprocessor/seq/size.hpp \
  /usr/include/boost/preprocessor/seq/for_each.hpp \
- /usr/include/boost/preprocessor/seq/seq.hpp \
- /usr/include/boost/preprocessor/seq/elem.hpp \
- /usr/include/boost/preprocessor/seq/for_each_i.hpp \
- /usr/include/boost/preprocessor/seq/enum.hpp \
  /usr/include/boost/fusion/adapted/struct/detail/at_impl.hpp \
  /usr/include/boost/fusion/adapted/struct/detail/is_view_impl.hpp \
  /usr/include/boost/fusion/adapted/struct/detail/is_sequence_impl.hpp \
@@ -942,6 +1000,11 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/math/special_functions/detail/bessel_yn.hpp \
  /usr/include/boost/math/special_functions/detail/bessel_y0.hpp \
  /usr/include/boost/math/special_functions/detail/bessel_y1.hpp \
+ /usr/include/boost/math/special_functions/detail/bessel_jy_zero.hpp \
+ /usr/include/boost/math/special_functions/cbrt.hpp \
+ /usr/include/boost/mpl/divides.hpp \
+ /usr/include/boost/mpl/aux_/preprocessed/gcc/divides.hpp \
+ /usr/include/boost/math/special_functions/detail/airy_ai_bi_zero.hpp \
  /usr/include/boost/math/special_functions/detail/bessel_ik.hpp \
  /usr/include/boost/math/special_functions/round.hpp \
  /usr/include/boost/math/special_functions/detail/bessel_i0.hpp \
@@ -951,12 +1014,12 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/math/special_functions/detail/bessel_k1.hpp \
  /usr/include/boost/math/special_functions/detail/iconv.hpp \
  /usr/include/boost/math/special_functions/sinc.hpp \
+ /usr/include/boost/math/special_functions/acosh.hpp \
+ /usr/include/boost/math/special_functions/asinh.hpp \
+ /usr/include/boost/math/special_functions/atanh.hpp \
  /usr/include/boost/math/special_functions/beta.hpp \
  /usr/include/boost/math/special_functions/detail/ibeta_inverse.hpp \
  /usr/include/boost/math/special_functions/detail/t_distribution_inv.hpp \
- /usr/include/boost/math/special_functions/cbrt.hpp \
- /usr/include/boost/mpl/divides.hpp \
- /usr/include/boost/mpl/aux_/preprocessed/gcc/divides.hpp \
  /usr/include/boost/math/special_functions/detail/ibeta_inv_ab.hpp \
  /usr/include/boost/math/special_functions/binomial.hpp \
  /usr/include/boost/math/special_functions/digamma.hpp \
@@ -971,24 +1034,17 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/math/special_functions/expint.hpp \
  /usr/include/boost/math/special_functions/pow.hpp \
  /usr/include/boost/math/special_functions/hermite.hpp \
+ /usr/include/boost/math/special_functions/jacobi_elliptic.hpp \
  /usr/include/boost/math/special_functions/laguerre.hpp \
  /usr/include/boost/math/special_functions/legendre.hpp \
  /usr/include/boost/math/special_functions/next.hpp \
+ /usr/include/boost/math/special_functions/owens_t.hpp \
  /usr/include/boost/math/special_functions/sinhc.hpp \
  /usr/include/boost/math/special_functions/spherical_harmonic.hpp \
  /usr/include/boost/math/special_functions/zeta.hpp \
  /usr/include/boost/math/special_functions/modf.hpp \
+ /usr/include/boost/math/special_functions/hankel.hpp \
  /usr/include/boost/random/seed_seq.hpp \
- /usr/include/boost/range/begin.hpp /usr/include/boost/range/config.hpp \
- /usr/include/boost/range/iterator.hpp \
- /usr/include/boost/range/mutable_iterator.hpp \
- /usr/include/boost/range/detail/extract_optional_type.hpp \
- /usr/include/boost/iterator/iterator_traits.hpp \
- /usr/include/boost/range/const_iterator.hpp \
- /usr/include/boost/range/end.hpp \
- /usr/include/boost/range/detail/implementation_help.hpp \
- /usr/include/boost/range/detail/common.hpp \
- /usr/include/boost/range/detail/sfinae.hpp \
  /usr/include/boost/random/random_number_generator.hpp \
  /usr/include/boost/random/uniform_int_distribution.hpp \
  /usr/include/boost/random/detail/uniform_int_float.hpp \
@@ -1000,7 +1056,7 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/random/gamma_distribution.hpp \
  /usr/include/boost/random/exponential_distribution.hpp \
  /usr/include/boost/random/discrete_distribution.hpp \
- /usr/include/c++/4.7/numeric /usr/include/c++/4.7/bits/stl_numeric.h \
+ /usr/include/c++/4.8/numeric /usr/include/c++/4.8/bits/stl_numeric.h \
  /usr/include/boost/random/uniform_int.hpp \
  /usr/include/boost/random/detail/vector_io.hpp \
  /usr/include/boost/random/extreme_value_distribution.hpp \
@@ -1020,6 +1076,8 @@ sample_trainer-sample_trainer.o: sample_trainer.cpp ../config.h \
  /usr/include/boost/random/uniform_smallint.hpp \
  /usr/include/boost/random/weibull_distribution.hpp
 
+/usr/include/stdc-predef.h:
+
 ../config.h:
 
 sample_trainer.h:
@@ -1028,17 +1086,13 @@ sample_trainer.h:
 
 /usr/local/include/rcsc/trainer/trainer_config.h:
 
-/usr/include/c++/4.7/string:
+/usr/include/c++/4.8/string:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++config.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++config.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/os_defines.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/os_defines.h:
 
 /usr/include/features.h:
-
-/usr/include/stdc-predef.h:
-
-/usr/include/x86_64-linux-gnu/bits/predefs.h:
 
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 
@@ -1048,81 +1102,83 @@ sample_trainer.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/cpu_defines.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/cpu_defines.h:
 
-/usr/include/c++/4.7/bits/stringfwd.h:
+/usr/include/c++/4.8/bits/stringfwd.h:
 
-/usr/include/c++/4.7/bits/char_traits.h:
+/usr/include/c++/4.8/bits/memoryfwd.h:
 
-/usr/include/c++/4.7/bits/stl_algobase.h:
+/usr/include/c++/4.8/bits/char_traits.h:
 
-/usr/include/c++/4.7/bits/functexcept.h:
+/usr/include/c++/4.8/bits/stl_algobase.h:
 
-/usr/include/c++/4.7/bits/exception_defines.h:
+/usr/include/c++/4.8/bits/functexcept.h:
 
-/usr/include/c++/4.7/bits/cpp_type_traits.h:
+/usr/include/c++/4.8/bits/exception_defines.h:
 
-/usr/include/c++/4.7/ext/type_traits.h:
+/usr/include/c++/4.8/bits/cpp_type_traits.h:
 
-/usr/include/c++/4.7/ext/numeric_traits.h:
+/usr/include/c++/4.8/ext/type_traits.h:
 
-/usr/include/c++/4.7/bits/stl_pair.h:
+/usr/include/c++/4.8/ext/numeric_traits.h:
 
-/usr/include/c++/4.7/bits/move.h:
+/usr/include/c++/4.8/bits/stl_pair.h:
 
-/usr/include/c++/4.7/bits/concept_check.h:
+/usr/include/c++/4.8/bits/move.h:
 
-/usr/include/c++/4.7/bits/stl_iterator_base_types.h:
+/usr/include/c++/4.8/bits/concept_check.h:
 
-/usr/include/c++/4.7/bits/stl_iterator_base_funcs.h:
+/usr/include/c++/4.8/bits/stl_iterator_base_types.h:
 
-/usr/include/c++/4.7/bits/stl_iterator.h:
+/usr/include/c++/4.8/bits/stl_iterator_base_funcs.h:
 
-/usr/include/c++/4.7/debug/debug.h:
+/usr/include/c++/4.8/debug/debug.h:
 
-/usr/include/c++/4.7/bits/postypes.h:
+/usr/include/c++/4.8/bits/stl_iterator.h:
 
-/usr/include/c++/4.7/cwchar:
+/usr/include/c++/4.8/bits/postypes.h:
+
+/usr/include/c++/4.8/cwchar:
 
 /usr/include/wchar.h:
 
 /usr/include/stdio.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdarg.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdarg.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/stddef.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h:
 
 /usr/include/xlocale.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar2.h:
 
-/usr/include/c++/4.7/bits/allocator.h:
+/usr/include/c++/4.8/bits/allocator.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++allocator.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++allocator.h:
 
-/usr/include/c++/4.7/ext/new_allocator.h:
+/usr/include/c++/4.8/ext/new_allocator.h:
 
-/usr/include/c++/4.7/new:
+/usr/include/c++/4.8/new:
 
-/usr/include/c++/4.7/exception:
+/usr/include/c++/4.8/exception:
 
-/usr/include/c++/4.7/bits/atomic_lockfree_defines.h:
+/usr/include/c++/4.8/bits/atomic_lockfree_defines.h:
 
-/usr/include/c++/4.7/bits/localefwd.h:
+/usr/include/c++/4.8/bits/localefwd.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++locale.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++locale.h:
 
-/usr/include/c++/4.7/clocale:
+/usr/include/c++/4.8/clocale:
 
 /usr/include/locale.h:
 
 /usr/include/x86_64-linux-gnu/bits/locale.h:
 
-/usr/include/c++/4.7/iosfwd:
+/usr/include/c++/4.8/iosfwd:
 
-/usr/include/c++/4.7/cctype:
+/usr/include/c++/4.8/cctype:
 
 /usr/include/ctype.h:
 
@@ -1138,23 +1194,23 @@ sample_trainer.h:
 
 /usr/include/x86_64-linux-gnu/bits/byteswap-16.h:
 
-/usr/include/c++/4.7/bits/ostream_insert.h:
+/usr/include/c++/4.8/bits/ostream_insert.h:
 
-/usr/include/c++/4.7/bits/cxxabi_forced.h:
+/usr/include/c++/4.8/bits/cxxabi_forced.h:
 
-/usr/include/c++/4.7/bits/stl_function.h:
+/usr/include/c++/4.8/bits/stl_function.h:
 
-/usr/include/c++/4.7/backward/binders.h:
+/usr/include/c++/4.8/backward/binders.h:
 
-/usr/include/c++/4.7/bits/range_access.h:
+/usr/include/c++/4.8/bits/range_access.h:
 
-/usr/include/c++/4.7/bits/basic_string.h:
+/usr/include/c++/4.8/bits/basic_string.h:
 
-/usr/include/c++/4.7/ext/atomicity.h:
+/usr/include/c++/4.8/ext/atomicity.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/gthr.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/gthr.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/gthr-default.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/gthr-default.h:
 
 /usr/include/pthread.h:
 
@@ -1172,9 +1228,9 @@ sample_trainer.h:
 
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/atomic_word.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/atomic_word.h:
 
-/usr/include/c++/4.7/bits/basic_string.tcc:
+/usr/include/c++/4.8/bits/basic_string.tcc:
 
 /usr/local/include/rcsc/coach/global_world_model.h:
 
@@ -1186,49 +1242,49 @@ sample_trainer.h:
 
 /usr/local/include/rcsc/geom/angle_deg.h:
 
-/usr/include/c++/4.7/functional:
+/usr/include/c++/4.8/functional:
 
-/usr/include/c++/4.7/iostream:
+/usr/include/c++/4.8/iostream:
 
-/usr/include/c++/4.7/ostream:
+/usr/include/c++/4.8/ostream:
 
-/usr/include/c++/4.7/ios:
+/usr/include/c++/4.8/ios:
 
-/usr/include/c++/4.7/bits/ios_base.h:
+/usr/include/c++/4.8/bits/ios_base.h:
 
-/usr/include/c++/4.7/bits/locale_classes.h:
+/usr/include/c++/4.8/bits/locale_classes.h:
 
-/usr/include/c++/4.7/bits/locale_classes.tcc:
+/usr/include/c++/4.8/bits/locale_classes.tcc:
 
-/usr/include/c++/4.7/streambuf:
+/usr/include/c++/4.8/streambuf:
 
-/usr/include/c++/4.7/bits/streambuf.tcc:
+/usr/include/c++/4.8/bits/streambuf.tcc:
 
-/usr/include/c++/4.7/bits/basic_ios.h:
+/usr/include/c++/4.8/bits/basic_ios.h:
 
-/usr/include/c++/4.7/bits/locale_facets.h:
+/usr/include/c++/4.8/bits/locale_facets.h:
 
-/usr/include/c++/4.7/cwctype:
+/usr/include/c++/4.8/cwctype:
 
 /usr/include/wctype.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/ctype_base.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/ctype_base.h:
 
-/usr/include/c++/4.7/bits/streambuf_iterator.h:
+/usr/include/c++/4.8/bits/streambuf_iterator.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/ctype_inline.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/ctype_inline.h:
 
-/usr/include/c++/4.7/bits/locale_facets.tcc:
+/usr/include/c++/4.8/bits/locale_facets.tcc:
 
-/usr/include/c++/4.7/bits/basic_ios.tcc:
+/usr/include/c++/4.8/bits/basic_ios.tcc:
 
-/usr/include/c++/4.7/bits/ostream.tcc:
+/usr/include/c++/4.8/bits/ostream.tcc:
 
-/usr/include/c++/4.7/istream:
+/usr/include/c++/4.8/istream:
 
-/usr/include/c++/4.7/bits/istream.tcc:
+/usr/include/c++/4.8/bits/istream.tcc:
 
-/usr/include/c++/4.7/cmath:
+/usr/include/c++/4.8/cmath:
 
 /usr/include/math.h:
 
@@ -1264,13 +1320,13 @@ sample_trainer.h:
 
 /usr/include/boost/config/select_stdlib_config.hpp:
 
-/usr/include/c++/4.7/cstddef:
+/usr/include/c++/4.8/cstddef:
 
 /usr/include/boost/config/no_tr1/utility.hpp:
 
-/usr/include/c++/4.7/utility:
+/usr/include/c++/4.8/utility:
 
-/usr/include/c++/4.7/bits/stl_relops.h:
+/usr/include/c++/4.8/bits/stl_relops.h:
 
 /usr/include/boost/config/stdlib/libstdcpp3.hpp:
 
@@ -1290,7 +1346,7 @@ sample_trainer.h:
 
 /usr/include/boost/config/platform/linux.hpp:
 
-/usr/include/c++/4.7/cstdlib:
+/usr/include/c++/4.8/cstdlib:
 
 /usr/include/stdlib.h:
 
@@ -1312,6 +1368,8 @@ sample_trainer.h:
 
 /usr/include/alloca.h:
 
+/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
@@ -1320,39 +1378,39 @@ sample_trainer.h:
 
 /usr/include/boost/config/suffix.hpp:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdint.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/stdint.h:
 
 /usr/include/stdint.h:
 
 /usr/local/include/rcsc/soccer_math.h:
 
-/usr/include/c++/4.7/map:
+/usr/include/c++/4.8/map:
 
-/usr/include/c++/4.7/bits/stl_tree.h:
+/usr/include/c++/4.8/bits/stl_tree.h:
 
-/usr/include/c++/4.7/bits/stl_map.h:
+/usr/include/c++/4.8/bits/stl_map.h:
 
-/usr/include/c++/4.7/bits/stl_multimap.h:
+/usr/include/c++/4.8/bits/stl_multimap.h:
 
-/usr/include/c++/4.7/vector:
+/usr/include/c++/4.8/vector:
 
-/usr/include/c++/4.7/bits/stl_construct.h:
+/usr/include/c++/4.8/bits/stl_construct.h:
 
-/usr/include/c++/4.7/ext/alloc_traits.h:
+/usr/include/c++/4.8/ext/alloc_traits.h:
 
-/usr/include/c++/4.7/bits/stl_uninitialized.h:
+/usr/include/c++/4.8/bits/stl_uninitialized.h:
 
-/usr/include/c++/4.7/bits/stl_vector.h:
+/usr/include/c++/4.8/bits/stl_vector.h:
 
-/usr/include/c++/4.7/bits/stl_bvector.h:
+/usr/include/c++/4.8/bits/stl_bvector.h:
 
-/usr/include/c++/4.7/bits/vector.tcc:
+/usr/include/c++/4.8/bits/vector.tcc:
 
-/usr/include/c++/4.7/list:
+/usr/include/c++/4.8/list:
 
-/usr/include/c++/4.7/bits/stl_list.h:
+/usr/include/c++/4.8/bits/stl_list.h:
 
-/usr/include/c++/4.7/bits/list.tcc:
+/usr/include/c++/4.8/bits/list.tcc:
 
 /usr/local/include/rcsc/coach/player_type_analyzer.h:
 
@@ -1366,13 +1424,13 @@ sample_trainer.h:
 
 /usr/include/boost/config/no_tr1/memory.hpp:
 
-/usr/include/c++/4.7/memory:
+/usr/include/c++/4.8/memory:
 
-/usr/include/c++/4.7/bits/stl_tempbuf.h:
+/usr/include/c++/4.8/bits/stl_tempbuf.h:
 
-/usr/include/c++/4.7/bits/stl_raw_storage_iter.h:
+/usr/include/c++/4.8/bits/stl_raw_storage_iter.h:
 
-/usr/include/c++/4.7/backward/auto_ptr.h:
+/usr/include/c++/4.8/backward/auto_ptr.h:
 
 /usr/include/boost/assert.hpp:
 
@@ -1402,11 +1460,13 @@ sample_trainer.h:
 
 /usr/include/boost/detail/sp_typeinfo.hpp:
 
-/usr/include/c++/4.7/typeinfo:
+/usr/include/c++/4.8/typeinfo:
 
 /usr/include/boost/smart_ptr/detail/sp_counted_impl.hpp:
 
 /usr/include/boost/smart_ptr/detail/sp_convertible.hpp:
+
+/usr/include/boost/smart_ptr/detail/sp_nullptr_t.hpp:
 
 /usr/include/boost/smart_ptr/detail/spinlock_pool.hpp:
 
@@ -1418,13 +1478,13 @@ sample_trainer.h:
 
 /usr/include/boost/memory_order.hpp:
 
-/usr/include/c++/4.7/algorithm:
+/usr/include/c++/4.8/algorithm:
 
-/usr/include/c++/4.7/bits/stl_algo.h:
+/usr/include/c++/4.8/bits/stl_algo.h:
 
-/usr/include/c++/4.7/bits/algorithmfwd.h:
+/usr/include/c++/4.8/bits/algorithmfwd.h:
 
-/usr/include/c++/4.7/bits/stl_heap.h:
+/usr/include/c++/4.8/bits/stl_heap.h:
 
 /usr/include/boost/smart_ptr/detail/operator_bool.hpp:
 
@@ -1438,11 +1498,11 @@ sample_trainer.h:
 
 /usr/local/include/rcsc/common/basic_client.h:
 
-/usr/include/c++/4.7/fstream:
+/usr/include/c++/4.8/fstream:
 
-/usr/include/c++/4.7/bits/codecvt.h:
+/usr/include/c++/4.8/bits/codecvt.h:
 
-/usr/include/c++/4.7/cstdio:
+/usr/include/c++/4.8/cstdio:
 
 /usr/include/libio.h:
 
@@ -1456,11 +1516,11 @@ sample_trainer.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/basic_file.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/basic_file.h:
 
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/c++io.h:
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/c++io.h:
 
-/usr/include/c++/4.7/bits/fstream.tcc:
+/usr/include/c++/4.8/bits/fstream.tcc:
 
 /usr/local/include/rcsc/common/player_param.h:
 
@@ -1480,11 +1540,11 @@ sample_trainer.h:
 
 /usr/include/boost/lexical_cast.hpp:
 
-/usr/include/c++/4.7/climits:
+/usr/include/c++/4.8/climits:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/limits.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed/limits.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/syslimits.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -1498,7 +1558,7 @@ sample_trainer.h:
 
 /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
 
-/usr/include/c++/4.7/cstring:
+/usr/include/c++/4.8/cstring:
 
 /usr/include/string.h:
 
@@ -1506,7 +1566,7 @@ sample_trainer.h:
 
 /usr/include/boost/limits.hpp:
 
-/usr/include/c++/4.7/limits:
+/usr/include/c++/4.8/limits:
 
 /usr/include/boost/mpl/if.hpp:
 
@@ -1668,6 +1728,18 @@ sample_trainer.h:
 
 /usr/include/boost/mpl/aux_/lambda_support.hpp:
 
+/usr/include/boost/type_traits/ice.hpp:
+
+/usr/include/boost/type_traits/detail/yes_no_type.hpp:
+
+/usr/include/boost/type_traits/detail/ice_or.hpp:
+
+/usr/include/boost/type_traits/detail/ice_and.hpp:
+
+/usr/include/boost/type_traits/detail/ice_not.hpp:
+
+/usr/include/boost/type_traits/detail/ice_eq.hpp:
+
 /usr/include/boost/type_traits/is_pointer.hpp:
 
 /usr/include/boost/type_traits/is_member_pointer.hpp:
@@ -1700,19 +1772,61 @@ sample_trainer.h:
 
 /usr/include/boost/type_traits/detail/bool_trait_undef.hpp:
 
-/usr/include/boost/type_traits/detail/ice_and.hpp:
+/usr/include/boost/static_assert.hpp:
 
-/usr/include/boost/type_traits/detail/ice_not.hpp:
+/usr/include/boost/detail/lcast_precision.hpp:
 
-/usr/include/boost/type_traits/is_integral.hpp:
+/usr/include/boost/integer_traits.hpp:
 
-/usr/include/boost/type_traits/is_arithmetic.hpp:
+/usr/include/boost/type_traits/is_abstract.hpp:
 
-/usr/include/boost/type_traits/is_float.hpp:
+/usr/include/boost/type_traits/intrinsics.hpp:
 
-/usr/include/boost/type_traits/detail/ice_or.hpp:
+/usr/include/boost/type_traits/is_same.hpp:
 
-/usr/include/boost/type_traits/remove_pointer.hpp:
+/usr/include/boost/type_traits/is_reference.hpp:
+
+/usr/include/boost/type_traits/is_lvalue_reference.hpp:
+
+/usr/include/boost/type_traits/is_rvalue_reference.hpp:
+
+/usr/include/boost/type_traits/is_volatile.hpp:
+
+/usr/include/c++/4.8/locale:
+
+/usr/include/c++/4.8/bits/locale_facets_nonio.h:
+
+/usr/include/c++/4.8/ctime:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/time_members.h:
+
+/usr/include/x86_64-linux-gnu/c++/4.8/bits/messages_members.h:
+
+/usr/include/libintl.h:
+
+/usr/include/c++/4.8/bits/locale_facets_nonio.tcc:
+
+/usr/include/c++/4.8/sstream:
+
+/usr/include/c++/4.8/bits/sstream.tcc:
+
+/usr/include/boost/array.hpp:
+
+/usr/include/c++/4.8/stdexcept:
+
+/usr/include/boost/swap.hpp:
+
+/usr/include/boost/utility/swap.hpp:
+
+/usr/include/boost/detail/iterator.hpp:
+
+/usr/include/c++/4.8/iterator:
+
+/usr/include/c++/4.8/bits/stream_iterator.h:
+
+/usr/include/boost/functional/hash_fwd.hpp:
+
+/usr/include/boost/functional/hash/hash_fwd.hpp:
 
 /usr/include/boost/numeric/conversion/cast.hpp:
 
@@ -1724,7 +1838,11 @@ sample_trainer.h:
 
 /usr/include/boost/numeric/conversion/detail/conversion_traits.hpp:
 
-/usr/include/boost/type_traits/is_same.hpp:
+/usr/include/boost/type_traits/is_arithmetic.hpp:
+
+/usr/include/boost/type_traits/is_integral.hpp:
+
+/usr/include/boost/type_traits/is_float.hpp:
 
 /usr/include/boost/numeric/conversion/detail/meta.hpp:
 
@@ -1852,27 +1970,11 @@ sample_trainer.h:
 
 /usr/include/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_long_long.hpp:
 
-/usr/include/boost/type_traits/ice.hpp:
-
-/usr/include/boost/type_traits/detail/yes_no_type.hpp:
-
-/usr/include/boost/type_traits/detail/ice_eq.hpp:
-
 /usr/include/boost/type_traits/make_unsigned.hpp:
 
 /usr/include/boost/type_traits/is_signed.hpp:
 
 /usr/include/boost/type_traits/is_enum.hpp:
-
-/usr/include/boost/type_traits/intrinsics.hpp:
-
-/usr/include/boost/type_traits/is_reference.hpp:
-
-/usr/include/boost/type_traits/is_lvalue_reference.hpp:
-
-/usr/include/boost/type_traits/is_rvalue_reference.hpp:
-
-/usr/include/boost/type_traits/is_volatile.hpp:
 
 /usr/include/boost/type_traits/is_unsigned.hpp:
 
@@ -1882,19 +1984,55 @@ sample_trainer.h:
 
 /usr/include/boost/type_traits/add_volatile.hpp:
 
-/usr/include/boost/static_assert.hpp:
+/usr/include/boost/type_traits/remove_pointer.hpp:
+
+/usr/include/boost/type_traits/has_left_shift.hpp:
+
+/usr/include/boost/type_traits/detail/has_binary_operator.hpp:
+
+/usr/include/boost/type_traits/is_base_of.hpp:
+
+/usr/include/boost/type_traits/is_base_and_derived.hpp:
+
+/usr/include/boost/type_traits/is_class.hpp:
+
+/usr/include/boost/type_traits/is_convertible.hpp:
+
+/usr/include/boost/type_traits/is_array.hpp:
+
+/usr/include/boost/type_traits/is_void.hpp:
+
+/usr/include/boost/type_traits/add_lvalue_reference.hpp:
+
+/usr/include/boost/type_traits/add_reference.hpp:
+
+/usr/include/boost/type_traits/add_rvalue_reference.hpp:
+
+/usr/include/boost/type_traits/is_function.hpp:
+
+/usr/include/boost/type_traits/detail/false_result.hpp:
+
+/usr/include/boost/type_traits/detail/is_function_ptr_helper.hpp:
+
+/usr/include/boost/type_traits/is_fundamental.hpp:
+
+/usr/include/boost/type_traits/remove_reference.hpp:
+
+/usr/include/boost/type_traits/has_right_shift.hpp:
 
 /usr/include/boost/math/special_functions/sign.hpp:
 
 /usr/include/boost/math/tools/config.hpp:
 
-/usr/include/boost/math/tools/user.hpp:
+/usr/include/c++/4.8/cfloat:
 
-/usr/include/boost/math/special_functions/detail/round_fwd.hpp:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h:
+
+/usr/include/boost/math/tools/user.hpp:
 
 /usr/include/boost/detail/fenv.hpp:
 
-/usr/include/c++/4.7/fenv.h:
+/usr/include/c++/4.8/fenv.h:
 
 /usr/include/fenv.h:
 
@@ -1904,21 +2042,11 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions/math_fwd.hpp:
 
+/usr/include/boost/math/special_functions/detail/round_fwd.hpp:
+
 /usr/include/boost/math/tools/promotion.hpp:
 
 /usr/include/boost/type_traits/is_floating_point.hpp:
-
-/usr/include/boost/type_traits/is_convertible.hpp:
-
-/usr/include/boost/type_traits/is_array.hpp:
-
-/usr/include/boost/type_traits/add_reference.hpp:
-
-/usr/include/boost/type_traits/is_void.hpp:
-
-/usr/include/boost/type_traits/is_abstract.hpp:
-
-/usr/include/boost/type_traits/add_rvalue_reference.hpp:
 
 /usr/include/boost/mpl/or.hpp:
 
@@ -2264,11 +2392,7 @@ sample_trainer.h:
 
 /usr/include/boost/config/no_tr1/complex.hpp:
 
-/usr/include/c++/4.7/complex:
-
-/usr/include/c++/4.7/sstream:
-
-/usr/include/c++/4.7/bits/sstream.tcc:
+/usr/include/c++/4.8/complex:
 
 /usr/include/boost/math/special_functions/detail/fp_traits.hpp:
 
@@ -2278,37 +2402,145 @@ sample_trainer.h:
 
 /usr/include/boost/math/tools/real_cast.hpp:
 
-/usr/include/boost/detail/lcast_precision.hpp:
+/usr/include/boost/range/iterator_range_core.hpp:
 
-/usr/include/boost/integer_traits.hpp:
+/usr/include/boost/iterator/iterator_traits.hpp:
+
+/usr/include/boost/iterator/iterator_facade.hpp:
+
+/usr/include/boost/iterator.hpp:
+
+/usr/include/boost/iterator/interoperable.hpp:
+
+/usr/include/boost/iterator/detail/config_def.hpp:
+
+/usr/include/boost/iterator/detail/config_undef.hpp:
+
+/usr/include/boost/iterator/detail/facade_iterator_category.hpp:
+
+/usr/include/boost/iterator/iterator_categories.hpp:
+
+/usr/include/boost/detail/indirect_traits.hpp:
+
+/usr/include/boost/iterator/detail/enable_if.hpp:
+
+/usr/include/boost/utility/addressof.hpp:
+
+/usr/include/boost/type_traits/add_pointer.hpp:
+
+/usr/include/boost/type_traits/remove_const.hpp:
+
+/usr/include/boost/type_traits/is_pod.hpp:
+
+/usr/include/boost/type_traits/is_scalar.hpp:
+
+/usr/include/boost/range/functions.hpp:
+
+/usr/include/boost/range/begin.hpp:
+
+/usr/include/boost/range/config.hpp:
+
+/usr/include/boost/range/iterator.hpp:
+
+/usr/include/boost/range/mutable_iterator.hpp:
+
+/usr/include/boost/range/detail/extract_optional_type.hpp:
+
+/usr/include/boost/range/const_iterator.hpp:
+
+/usr/include/boost/range/end.hpp:
+
+/usr/include/boost/range/detail/implementation_help.hpp:
+
+/usr/include/boost/range/detail/common.hpp:
+
+/usr/include/boost/range/detail/sfinae.hpp:
+
+/usr/include/boost/range/size.hpp:
+
+/usr/include/boost/range/size_type.hpp:
+
+/usr/include/boost/range/difference_type.hpp:
+
+/usr/include/boost/utility/enable_if.hpp:
+
+/usr/include/boost/range/distance.hpp:
+
+/usr/include/boost/range/empty.hpp:
+
+/usr/include/boost/range/rbegin.hpp:
+
+/usr/include/boost/range/reverse_iterator.hpp:
+
+/usr/include/boost/iterator/reverse_iterator.hpp:
+
+/usr/include/boost/next_prior.hpp:
+
+/usr/include/boost/iterator/iterator_adaptor.hpp:
+
+/usr/include/boost/range/rend.hpp:
+
+/usr/include/boost/range/algorithm/equal.hpp:
+
+/usr/include/boost/range/concepts.hpp:
+
+/usr/include/boost/concept_check.hpp:
+
+/usr/include/boost/concept/assert.hpp:
+
+/usr/include/boost/concept/detail/general.hpp:
+
+/usr/include/boost/concept/detail/backward_compatibility.hpp:
+
+/usr/include/boost/concept/detail/has_constraints.hpp:
+
+/usr/include/boost/type_traits/conversion_traits.hpp:
+
+/usr/include/boost/concept/usage.hpp:
+
+/usr/include/boost/concept/detail/concept_def.hpp:
+
+/usr/include/boost/preprocessor/seq/for_each_i.hpp:
+
+/usr/include/boost/preprocessor/repetition/for.hpp:
+
+/usr/include/boost/preprocessor/repetition/detail/for.hpp:
+
+/usr/include/boost/preprocessor/seq/seq.hpp:
+
+/usr/include/boost/preprocessor/seq/elem.hpp:
+
+/usr/include/boost/preprocessor/seq/size.hpp:
+
+/usr/include/boost/preprocessor/seq/enum.hpp:
+
+/usr/include/boost/concept/detail/concept_undef.hpp:
+
+/usr/include/boost/iterator/iterator_concepts.hpp:
+
+/usr/include/boost/range/value_type.hpp:
+
+/usr/include/boost/range/detail/misc_concept.hpp:
+
+/usr/include/boost/range/detail/safe_bool.hpp:
 
 /usr/include/boost/container/container_fwd.hpp:
 
-/usr/include/c++/4.7/locale:
+/usr/include/boost/integer.hpp:
 
-/usr/include/c++/4.7/bits/locale_facets_nonio.h:
+/usr/include/boost/integer_fwd.hpp:
 
-/usr/include/c++/4.7/ctime:
-
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/time_members.h:
-
-/usr/include/x86_64-linux-gnu/c++/4.7/./bits/messages_members.h:
-
-/usr/include/libintl.h:
-
-/usr/include/c++/4.7/bits/locale_facets_nonio.tcc:
-
-/usr/include/c++/4.7/cassert:
+/usr/include/c++/4.8/cassert:
 
 /usr/local/include/rcsc/param/cmd_line_parser.h:
 
 /usr/local/include/rcsc/param/param_parser.h:
 
-/usr/include/c++/4.7/set:
+/usr/include/c++/4.8/set:
 
-/usr/include/c++/4.7/bits/stl_set.h:
+/usr/include/c++/4.8/bits/stl_set.h:
 
-/usr/include/c++/4.7/bits/stl_multiset.h:
+/usr/include/c++/4.8/bits/stl_multiset.h:
 
 /usr/local/include/rcsc/random.h:
 
@@ -2322,21 +2554,13 @@ sample_trainer.h:
 
 /usr/include/boost/random/detail/seed.hpp:
 
-/usr/include/boost/utility/enable_if.hpp:
-
 /usr/include/boost/random/linear_congruential.hpp:
 
-/usr/include/c++/4.7/stdexcept:
-
 /usr/include/boost/integer/static_log2.hpp:
-
-/usr/include/boost/integer_fwd.hpp:
 
 /usr/include/boost/random/detail/const_mod.hpp:
 
 /usr/include/boost/random/detail/large_arithmetic.hpp:
-
-/usr/include/boost/integer.hpp:
 
 /usr/include/boost/random/detail/integer_log2.hpp:
 
@@ -2361,10 +2585,6 @@ sample_trainer.h:
 /usr/include/boost/random/inversive_congruential.hpp:
 
 /usr/include/boost/random/lagged_fibonacci.hpp:
-
-/usr/include/c++/4.7/iterator:
-
-/usr/include/c++/4.7/bits/stream_iterator.h:
 
 /usr/include/boost/random/uniform_01.hpp:
 
@@ -2392,15 +2612,25 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions.hpp:
 
-/usr/include/boost/math/special_functions/acosh.hpp:
+/usr/include/boost/math/special_functions/airy.hpp:
+
+/usr/include/boost/math/special_functions/bessel.hpp:
+
+/usr/include/boost/math/special_functions/detail/bessel_jy.hpp:
+
+/usr/include/boost/math/special_functions/gamma.hpp:
+
+/usr/include/boost/math/tools/series.hpp:
+
+/usr/include/boost/math/tools/fraction.hpp:
 
 /usr/include/boost/math/tools/precision.hpp:
 
-/usr/include/c++/4.7/iomanip:
-
 /usr/include/boost/math/policies/error_handling.hpp:
 
-/usr/include/c++/4.7/cerrno:
+/usr/include/c++/4.8/iomanip:
+
+/usr/include/c++/4.8/cerrno:
 
 /usr/include/errno.h:
 
@@ -2448,25 +2678,15 @@ sample_trainer.h:
 
 /usr/include/boost/type_traits/has_trivial_constructor.hpp:
 
-/usr/include/boost/type_traits/is_pod.hpp:
-
-/usr/include/boost/type_traits/is_scalar.hpp:
-
 /usr/include/boost/type_traits/type_with_alignment.hpp:
 
 /usr/include/boost/preprocessor/list/for_each_i.hpp:
-
-/usr/include/boost/preprocessor/repetition/for.hpp:
-
-/usr/include/boost/preprocessor/repetition/detail/for.hpp:
 
 /usr/include/boost/preprocessor/tuple/to_list.hpp:
 
 /usr/include/boost/preprocessor/list/transform.hpp:
 
 /usr/include/boost/preprocessor/list/append.hpp:
-
-/usr/include/boost/type_traits/remove_reference.hpp:
 
 /usr/include/boost/detail/reference_content.hpp:
 
@@ -2477,10 +2697,6 @@ sample_trainer.h:
 /usr/include/boost/none.hpp:
 
 /usr/include/boost/none_t.hpp:
-
-/usr/include/boost/utility/swap.hpp:
-
-/usr/include/boost/utility/addressof.hpp:
 
 /usr/include/boost/utility/compare_pointees.hpp:
 
@@ -2538,17 +2754,15 @@ sample_trainer.h:
 
 /usr/include/boost/format/detail/unset_macros.hpp:
 
+/usr/include/boost/math/constants/constants.hpp:
+
+/usr/include/boost/math/constants/calculate_constants.hpp:
+
+/usr/include/boost/math/special_functions/trunc.hpp:
+
 /usr/include/boost/math/special_functions/log1p.hpp:
 
-/usr/include/boost/math/tools/series.hpp:
-
 /usr/include/boost/math/tools/rational.hpp:
-
-/usr/include/boost/array.hpp:
-
-/usr/include/boost/swap.hpp:
-
-/usr/include/boost/detail/iterator.hpp:
 
 /usr/include/boost/math/tools/detail/polynomial_horner3_17.hpp:
 
@@ -2556,39 +2770,23 @@ sample_trainer.h:
 
 /usr/include/boost/math/tools/big_constant.hpp:
 
-/usr/include/boost/math/special_functions/asinh.hpp:
-
-/usr/include/boost/math/special_functions/sqrt1pm1.hpp:
+/usr/include/boost/math/special_functions/powm1.hpp:
 
 /usr/include/boost/math/special_functions/expm1.hpp:
 
-/usr/include/boost/math/special_functions/atanh.hpp:
-
-/usr/include/boost/math/special_functions/bessel.hpp:
-
-/usr/include/boost/math/special_functions/detail/bessel_jy.hpp:
-
-/usr/include/boost/math/special_functions/gamma.hpp:
-
-/usr/include/boost/math/tools/fraction.hpp:
-
-/usr/include/boost/math/constants/constants.hpp:
-
-/usr/include/boost/math/special_functions/trunc.hpp:
-
-/usr/include/boost/math/special_functions/powm1.hpp:
+/usr/include/boost/math/special_functions/sqrt1pm1.hpp:
 
 /usr/include/boost/math/special_functions/lanczos.hpp:
 
 /usr/include/boost/math/special_functions/detail/lanczos_sse2.hpp:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/emmintrin.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/emmintrin.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/xmmintrin.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/xmmintrin.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/mmintrin.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/mmintrin.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/4.7/include/mm_malloc.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/mm_malloc.h:
 
 /usr/include/boost/math/special_functions/detail/igamma_large.hpp:
 
@@ -2648,8 +2846,6 @@ sample_trainer.h:
 
 /usr/include/boost/fusion/support/tag_of.hpp:
 
-/usr/include/boost/type_traits/remove_const.hpp:
-
 /usr/include/boost/fusion/support/tag_of_fwd.hpp:
 
 /usr/include/boost/fusion/support/detail/is_mpl_sequence.hpp:
@@ -2669,8 +2865,6 @@ sample_trainer.h:
 /usr/include/boost/detail/templated_streams.hpp:
 
 /usr/include/boost/type_traits/is_empty.hpp:
-
-/usr/include/boost/type_traits/is_class.hpp:
 
 /usr/include/boost/type_traits/is_stateless.hpp:
 
@@ -2705,10 +2899,6 @@ sample_trainer.h:
 /usr/include/boost/fusion/iterator/equal_to.hpp:
 
 /usr/include/boost/fusion/support/is_iterator.hpp:
-
-/usr/include/boost/type_traits/is_base_of.hpp:
-
-/usr/include/boost/type_traits/is_base_and_derived.hpp:
 
 /usr/include/boost/fusion/sequence/intrinsic/segments.hpp:
 
@@ -2954,6 +3144,8 @@ sample_trainer.h:
 
 /usr/include/boost/fusion/sequence/comparison/detail/equal_to.hpp:
 
+/usr/include/boost/fusion/support/as_const.hpp:
+
 /usr/include/boost/fusion/sequence/comparison/enable_comparison.hpp:
 
 /usr/include/boost/fusion/sequence/comparison/greater.hpp:
@@ -3010,17 +3202,7 @@ sample_trainer.h:
 
 /usr/include/boost/fusion/adapted/struct/detail/adapt_base.hpp:
 
-/usr/include/boost/preprocessor/seq/size.hpp:
-
 /usr/include/boost/preprocessor/seq/for_each.hpp:
-
-/usr/include/boost/preprocessor/seq/seq.hpp:
-
-/usr/include/boost/preprocessor/seq/elem.hpp:
-
-/usr/include/boost/preprocessor/seq/for_each_i.hpp:
-
-/usr/include/boost/preprocessor/seq/enum.hpp:
 
 /usr/include/boost/fusion/adapted/struct/detail/at_impl.hpp:
 
@@ -3078,6 +3260,16 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions/detail/bessel_y1.hpp:
 
+/usr/include/boost/math/special_functions/detail/bessel_jy_zero.hpp:
+
+/usr/include/boost/math/special_functions/cbrt.hpp:
+
+/usr/include/boost/mpl/divides.hpp:
+
+/usr/include/boost/mpl/aux_/preprocessed/gcc/divides.hpp:
+
+/usr/include/boost/math/special_functions/detail/airy_ai_bi_zero.hpp:
+
 /usr/include/boost/math/special_functions/detail/bessel_ik.hpp:
 
 /usr/include/boost/math/special_functions/round.hpp:
@@ -3096,17 +3288,17 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions/sinc.hpp:
 
+/usr/include/boost/math/special_functions/acosh.hpp:
+
+/usr/include/boost/math/special_functions/asinh.hpp:
+
+/usr/include/boost/math/special_functions/atanh.hpp:
+
 /usr/include/boost/math/special_functions/beta.hpp:
 
 /usr/include/boost/math/special_functions/detail/ibeta_inverse.hpp:
 
 /usr/include/boost/math/special_functions/detail/t_distribution_inv.hpp:
-
-/usr/include/boost/math/special_functions/cbrt.hpp:
-
-/usr/include/boost/mpl/divides.hpp:
-
-/usr/include/boost/mpl/aux_/preprocessed/gcc/divides.hpp:
 
 /usr/include/boost/math/special_functions/detail/ibeta_inv_ab.hpp:
 
@@ -3136,11 +3328,15 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions/hermite.hpp:
 
+/usr/include/boost/math/special_functions/jacobi_elliptic.hpp:
+
 /usr/include/boost/math/special_functions/laguerre.hpp:
 
 /usr/include/boost/math/special_functions/legendre.hpp:
 
 /usr/include/boost/math/special_functions/next.hpp:
+
+/usr/include/boost/math/special_functions/owens_t.hpp:
 
 /usr/include/boost/math/special_functions/sinhc.hpp:
 
@@ -3150,29 +3346,9 @@ sample_trainer.h:
 
 /usr/include/boost/math/special_functions/modf.hpp:
 
+/usr/include/boost/math/special_functions/hankel.hpp:
+
 /usr/include/boost/random/seed_seq.hpp:
-
-/usr/include/boost/range/begin.hpp:
-
-/usr/include/boost/range/config.hpp:
-
-/usr/include/boost/range/iterator.hpp:
-
-/usr/include/boost/range/mutable_iterator.hpp:
-
-/usr/include/boost/range/detail/extract_optional_type.hpp:
-
-/usr/include/boost/iterator/iterator_traits.hpp:
-
-/usr/include/boost/range/const_iterator.hpp:
-
-/usr/include/boost/range/end.hpp:
-
-/usr/include/boost/range/detail/implementation_help.hpp:
-
-/usr/include/boost/range/detail/common.hpp:
-
-/usr/include/boost/range/detail/sfinae.hpp:
 
 /usr/include/boost/random/random_number_generator.hpp:
 
@@ -3196,9 +3372,9 @@ sample_trainer.h:
 
 /usr/include/boost/random/discrete_distribution.hpp:
 
-/usr/include/c++/4.7/numeric:
+/usr/include/c++/4.8/numeric:
 
-/usr/include/c++/4.7/bits/stl_numeric.h:
+/usr/include/c++/4.8/bits/stl_numeric.h:
 
 /usr/include/boost/random/uniform_int.hpp:
 

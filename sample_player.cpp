@@ -646,7 +646,49 @@ SamplePlayer::ClosestPlayerToBall(PlayerAgent * agent){
     return mindisunum;
 }
 
+void takePass(PlayerAgent * agent ,int passTaker,int passReceiver )
+{
 
+    if(agent->world().self().unum()==passTaker)
+        {
+            const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);
+            if(!receiver)return;
+
+        const Vector2D receiver_pos =receiver->pos()+receiver->vel();
+        if( agent->world().self().isKickable())
+        {
+            double power=(double) receiver_pos.dist(agent->world().self().pos());
+            Body_TurnToPoint( receiver_pos ).execute( agent );
+            Body_KickOneStep( receiver_pos,
+                          power).execute( agent);
+
+        }
+    }
+     const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+      if(agent->world().self().unum()==passReceiver)
+       Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
+}
+void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
+{
+        const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);
+        if(!dribbler)return;
+        if(agent->world().self().unum()==unum)
+        {
+        bool kickable = agent->world().self().isKickable();
+        if(dribbler->pos().dist(point)>10)
+        if(kickable)
+        {
+             Body_TurnToPoint( point ).execute( agent );
+             Body_KickOneStep(point,power).execute( agent);
+        }
+        else
+        {
+             const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
+        }
+        //Body_Dribble( dribbler->pos()+Vector2D(20,0),1.0,ServerParam::i().maxDashPower(),2).execute( agent );         
+        }
+}
 //main function that will be used.
 
 bool
@@ -693,20 +735,17 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
   //   const PlayerPtrCont & team = wm.teammatesFromSelf();
  //    const PlayerObject * nearest_team=team.front();
 	if ( kickable && !Opponenthasball)
-    {printf("\nFirst@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");   
-     //  doKick( this);
-         Body_SmartKick( Vector2D(-1000,0),
-                    10,
-                    10 * 0.96,
-                    1 ).execute( agent );
+    {
+         //doKick( this);
+        
+       takePass(this,world().self().unum(),(world().self().unum()==11)?1:world().self().unum()+1);
+      //  makeDribble(this,Vector2D(100,0),world().self().unum(),0.5);
     }
 
     //This is for off the ball movement which attacking, where to go for passes etc.
     else if (!kickable && !Opponenthasball)
-    {    printf("\nSecond");   
-              
-        doMove(this);
-        return true;
+    {   
+            doMove(this);
     } 
 
     //ATTACK ENDS HERE
