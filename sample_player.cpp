@@ -62,6 +62,8 @@
 #include <rcsc/action/body_intercept.h>
 #include <rcsc/action/body_smart_kick.h>
 #include <rcsc/action/body_kick_one_step.h>
+#include <rcsc/action/body_kick_to_relative.h>
+ 
 #include <rcsc/action/neck_scan_field.h>
 #include <rcsc/action/neck_turn_to_ball_or_scan.h>
 #include <rcsc/action/neck_turn_to_point.h> 
@@ -75,6 +77,8 @@
 #include <rcsc/player/say_message_builder.h>
 #include <rcsc/player/audio_sensor.h>
 #include <rcsc/player/freeform_parser.h>
+ #include <rcsc/player/free_message.h>
+ 
 #include "bhv_chain_action.h"
 #include <rcsc/action/body_advance_ball.h>
 #include <rcsc/action/body_dribble.h>
@@ -90,6 +94,7 @@
 #include <rcsc/common/say_message_parser.h>
 // #include <rcsc/common/free_message_parser.h>
 
+
 #include <rcsc/param/param_map.h>
 #include <rcsc/param/cmd_line_parser.h>
 
@@ -98,13 +103,144 @@
 #include <string>
 #include <cstdlib>
 #include <vector> 
-
+#include <algorithm>   
 using namespace rcsc;
-
+using namespace std;
 /*-------------------------------------------------------------------*/
 /*!
 
  */
+void takeShoot(PlayerAgent * agent)
+{
+
+}
+void takePass(PlayerAgent * agent ,int passTaker,int passReceiver )
+{
+  const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+  const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);
+            if(!receiver)return;
+  const Vector2D receiver_pos =receiver->pos()+receiver->vel();
+
+    if(agent->world().self().unum()==passTaker)
+        {
+
+         if( agent->world().self().isKickable())
+        {
+ 
+           double ballspeed=ServerParam::i().ballSpeedMax();
+            double distance=(double) receiver_pos.dist(agent->world().self().pos());
+        
+            cout<<"##########################"<<distance<<"##########################"<<endl;
+
+            Body_TurnToPoint( receiver_pos ).execute( agent );
+         //   if(distance>30)
+          //  Body_SmartKick( receiver_pos,ballspeed,ballspeed*0.96,3 ).execute( agent );
+          //   else
+            Body_KickOneStep( receiver_pos,ballspeed*(distance/30)).execute( agent);
+         //   Body_KickToRelative(distance,180,true).execute(agent);
+
+            Vector2D ball_vel( 0.0, 0.0 );
+            if ( ! agent->effector().queuedNextBallKickable() )
+            ball_vel = agent->effector().queuedNextBallVel();
+     
+            agent->addSayMessage( 
+                new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel) 
+                );     
+
+
+    
+        }
+        }
+
+        
+
+}
+void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
+{
+        const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);
+        const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+        if(!dribbler)return;
+        if(agent->world().self().unum()==unum)
+        {
+        bool kickable = agent->world().self().isKickable();
+       
+        if(dribbler->pos().dist(point)>10)
+        {
+            if(kickable)
+            {
+             Body_TurnToPoint( point ).execute( agent );
+             Body_KickOneStep(point,power).execute( agent);
+            }
+            else
+            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );         
+           
+        }
+        else if(!kickable){
+            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
+        }
+        
+        }
+         
+}
+
+void followDribbler(PlayerAgent * agent)
+{
+
+
+}
+void giveThrough(PlayerAgent * agent,int unum,double approxDist)
+{
+    const WorldModel & wm = agent->world();
+      const PlayerObject * teammate=wm.getTeammateNearestToSelf(1);
+   if(!teammate)
+       return;
+
+     if( wm.self().isKickable())
+        {
+      //   const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
+       
+         
+            Vector2D pass_point(0.0,0.0);
+           pass_point=teammate->pos()+Vector2D(approxDist,0.0);
+            double ballspeed=ServerParam::i().ballSpeedMax();
+           double distance=(double) pass_point.dist(agent->world().self().pos());
+           Body_TurnToPoint(  pass_point ).execute( agent );
+           Body_KickOneStep(  pass_point,ballspeed*(distance/30)).execute( agent);
+           Vector2D ball_vel( 0.0, 0.0 );
+           if ( ! agent->effector().queuedNextBallKickable() )
+           ball_vel = agent->effector().queuedNextBallVel();
+           const ActionEffector& M_effector=agent->effector();
+           const PassMessage* mes=new PassMessage( teammate->unum(),pass_point ,M_effector.queuedNextBallPos(),ball_vel);
+           agent->addSayMessage(mes);     
+           
+         
+           
+             
+        }
+
+}
+void runThrough(PlayerAgent * agent)
+{
+
+       const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
+       if(!M_pass.empty() && M_pass.front().receiver_==agent->world().self().unum() )
+            {    
+
+            const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+            double distance= agent->world().ball().pos().dist(agent->world().self().pos());
+                   
+            Body_GoToPoint(agent->effector().queuedNextBallPos(), 1, dash_power).
+            execute( agent );
+/*           Vector2D ball_vel( 0.0, 0.0 );
+           Vector2D ball_pos(0.0,0.0);
+           const ActionEffector& M_effector=agent->effector();
+           ball_vel = M_effector.queuedNextBallVel();
+           ball_pos=M_effector.queuedNextBallPos();*/
+          
+          // 
+            }
+
+}
 SamplePlayer::SamplePlayer()
     : PlayerAgent(),
       M_communication(),
@@ -330,16 +466,18 @@ SamplePlayer::actionImpl()
             kickable = false;
         }
 
+      // takePass(this,wm.self().unum(),1);//world().teammatesFromSelf().front()->unum());
         if ( kickable )
         {
-		printf("asfasfa");
+      giveThrough(this,wm.self().unum(),10);
+	   
             //Bhv_BasicMove().execute(this);
-            Bhv_BasicOffensiveKick().execute(this);
+          //  Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
         //        Body_HoldBall().execute( this );
-                //doKick( this);
+            //    doKick( this);
                 //Bhv_BasicOffensiveKick().execute(this);
-                //PassToBestPlayer(this);   
+               // PassToBestPlayer(this);   
             //f}                
         }
         else
@@ -646,49 +784,7 @@ SamplePlayer::ClosestPlayerToBall(PlayerAgent * agent){
     return mindisunum;
 }
 
-void takePass(PlayerAgent * agent ,int passTaker,int passReceiver )
-{
 
-    if(agent->world().self().unum()==passTaker)
-        {
-            const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);
-            if(!receiver)return;
-
-        const Vector2D receiver_pos =receiver->pos()+receiver->vel();
-        if( agent->world().self().isKickable())
-        {
-            double power=(double) receiver_pos.dist(agent->world().self().pos());
-            Body_TurnToPoint( receiver_pos ).execute( agent );
-            Body_KickOneStep( receiver_pos,
-                          power).execute( agent);
-
-        }
-    }
-     const double dash_power = Strategy::get_normal_dash_power( agent->world() );
-      if(agent->world().self().unum()==passReceiver)
-       Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
-}
-void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
-{
-        const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);
-        if(!dribbler)return;
-        if(agent->world().self().unum()==unum)
-        {
-        bool kickable = agent->world().self().isKickable();
-        if(dribbler->pos().dist(point)>10)
-        if(kickable)
-        {
-             Body_TurnToPoint( point ).execute( agent );
-             Body_KickOneStep(point,power).execute( agent);
-        }
-        else
-        {
-             const double dash_power = Strategy::get_normal_dash_power( agent->world() );
-            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
-        }
-        //Body_Dribble( dribbler->pos()+Vector2D(20,0),1.0,ServerParam::i().maxDashPower(),2).execute( agent );         
-        }
-}
 //main function that will be used.
 
 bool
@@ -729,24 +825,42 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //them with your own, similarly if you have taken defense, you need to comment out the existing
     //defence function and replace it with your own.
     //------------xx------------//
-
-   
+      
+   //  takePass(this,passer,(passer==11)?2:passer+1);
+    
     // I have the ball, what to do?
   //   const PlayerPtrCont & team = wm.teammatesFromSelf();
  //    const PlayerObject * nearest_team=team.front();
-	if ( kickable && !Opponenthasball)
+
+    //makeDribble(this,Vector2D(-10,0),8,0.5);
+    setNeckAction( new Neck_TurnToBall() );
+    Bhv_BodyNeckToBall().execute(this);
+   if(!agent->world().audioMemory().pass().empty() )
+ 
+    {  
+      cout<<"Pass Count: For"<<world().self().unum()<<" is "<<agent->world().audioMemory().pass().front().receiver_<<"  $"<<endl;
+
+    }
+
+    if ( kickable && !Opponenthasball)
     {
-         //doKick( this);
+     //    doKick( this);
+      //  takePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
+         giveThrough(this,world().self().unum(),10);
+
         
-       takePass(this,world().self().unum(),(world().self().unum()==11)?1:world().self().unum()+1);
-      //  makeDribble(this,Vector2D(100,0),world().self().unum(),0.5);
     }
 
     //This is for off the ball movement which attacking, where to go for passes etc.
     else if (!kickable && !Opponenthasball)
     {   
-            doMove(this);
-    } 
+        
+         
+          //   doMove(this);
+
+        
+          runThrough(this);
+        }
 
     //ATTACK ENDS HERE
     //--------XX----------XX--------//
@@ -764,7 +878,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
             agent->debugClient().addMessage( "ChainAction" );
             return true;
             }
-		 printf("akandvjna");             
+		          
             Bhv_BasicOffensiveKick().execute( agent );
             return true;
 
@@ -1060,34 +1174,7 @@ SamplePlayer::handleActionEnd()
         // top,lower
         debugClient().addLine( Vector2D( world().ourOffenseLineX(),
                                          -SP.pitchHalfWidth() ),
-                               Vector2D( world().ourOffenseLineX(),
-                                         -SP.pitchHalfWidth() + 3.0 ) );
-        // top,lower
-        debugClient().addLine( Vector2D( world().ourDefenseLineX(),
-                                         -SP.pitchHalfWidth() ),
-                               Vector2D( world().ourDefenseLineX(),
-                                         -SP.pitchHalfWidth() + 3.0 ) );
-
-        // bottom,upper
-        debugClient().addLine( Vector2D( world().theirOffenseLineX(),
-                                         +SP.pitchHalfWidth() - 3.0 ),
-                               Vector2D( world().theirOffenseLineX(),
-                                         +SP.pitchHalfWidth() ) );
-        //
-        debugClient().addLine( Vector2D( world().offsideLineX(),
-                                         world().self().pos().y - 15.0 ),
-                               Vector2D( world().offsideLineX(),
-                                         world(Opponenthasball
-Opponenthasball
-Opponenthasball
-Opponenthasball
-Opponenthasball
-Opponenthasball).self().pos().y + 15.0 ) );
-
-        // outside of pitch
-
-        // top,upper
-        debugClient().addLine( Vector2D( world().ourOffensePlayerLineX(),
+                               Vector2D( world().ourOffenseLineX(),f
                                          -SP.pitchHalfWidth() - 3.0 ),
                                Vector2D( world().ourOffensePlayerLineX(),
                                          -SP.pitchHalfWidth() ) );
