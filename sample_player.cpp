@@ -103,7 +103,9 @@
 #include <string>
 #include <cstdlib>
 #include <vector> 
-#include <algorithm>   
+#include <algorithm> 
+#include <queue>  
+
 using namespace rcsc;
 using namespace std;
 /*-------------------------------------------------------------------*/
@@ -115,26 +117,97 @@ const string ATTACK_FORMATION_CONF = "offense-formation.conf";
 //followDribbler 
 Formation::Ptr o_formation;
 vector<Vector2D > p_positions;
+
+void givePass(PlayerAgent * agent ,int passTaker,int passReceiver );
+void passAttack(PlayerAgent * agent)
+{
+    const double max_speed_ballplayer=ServerParam::i().ballSpeedMax()/ServerParam::i().defaultPlayerSpeedMax();
+ 
+    const WorldModel& wm=agent->world();
+    const PlayerPtrCont & opps = wm.opponentsFromSelf();
+    const PlayerPtrCont & ours = wm.teammatesFromSelf();
+    typedef pair<double,PlayerObject *> PLAYER;
+    typedef pair<double,PlayerObject *> Probe_Circle;
+    
+    priority_queue<PLAYER> passPriority;
+    vector<Probe_Circle> oppCapturedCircle;
+    vector<Probe_Circle> ourCapturedCircle;
+    Probe_Circle _NULL;
+    oppCapturedCircle.push_back(_NULL);
+    ourCapturedCircle.push_back(_NULL);
+
+     for ( PlayerPtrCont::const_iterator it = opps.begin();it != opps.end();++it )
+        {
+           
+            double distancef_ball=(double)(*it)->pos().dist(agent->world().ball().pos()); 
+            Probe_Circle curerntArea;
+            curerntArea.first=distancef_ball/(1+max_speed_ballplayer);
+            curerntArea.second=(*it);
+            oppCapturedCircle.push_back(curerntArea);
+        }    
+
+    for ( PlayerPtrCont::const_iterator it = ours.begin();it != ours.end();++it )
+        {
+            Vector2D oppGoalpost(0.0,0.0 );
+            double distancet_goal=(*it)->pos().dist(oppGoalpost); 
+            PLAYER current;
+            current.first=-distancet_goal;
+            current.second=(*it);
+             passPriority.push(current);
+
+            double distancef_ball=(double)(*it)->pos().dist(agent->world().ball().pos()); 
+            Probe_Circle curerntArea;
+            curerntArea.first=distancef_ball/(1+max_speed_ballplayer);
+            curerntArea.second=(*it);
+            ourCapturedCircle.push_back(curerntArea);
+        }
+
+    PlayerObject *bestPlayer=NULL;
+    bool canPass=false;
+    while(!passPriority.empty() && !bestPlayer)
+    {
+        PlayerObject* current=passPriority.top().second;
+        for(int i=1;i<12;i++)
+        {
+            Vector2D opp_pos;
+            Vector2D cur_pos=current->pos();
+            opp_pos=oppCapturedCircle[i].second->pos();
+            if(pow((opp_pos.x-cur_pos.x),2)+pow((opp_pos.y-cur_pos.y),2)<=pow(ourCapturedCircle[i].first,2))
+            {
+                break;
+            }
+            if(i==11)
+            {
+                canPass=true;
+                bestPlayer=current;
+            }
+
+        }
+
+    }
+    if(canPass)
+    cout<<bestPlayer->unum()<<endl;
+    cout<<"-----------------in"<<endl;
+    
+
+}
+
 Formation::Ptr  getFormation()
 {
 
    Formation::Ptr t_formation;
-   const string & file_path="formations-dt/offense-formation.conf";
+   const string & file_path="formations-dt/"+ATTACK_FORMATION_CONF;
    ifstream fin( file_path.c_str() );
    if ( ! fin.is_open() )
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ':'
-                  << " ***ERROR*** failed to open file [" << file_path << "]"
-                  << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << ':'<< " ***ERROR*** failed to open file [" << file_path << "]"<< std::endl;
         return t_formation;
     }
 
      t_formation=Formation::create(string("DelaunayTriangulation"));
     if ( ! t_formation->read( fin ) )
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ':'
-                  << " ***ERROR*** failed to read formation [" << file_path << "]"
-                  << std::endl;
+       std::cerr << __FILE__ << ':' << __LINE__ << ':'<< " ***ERROR*** failed to open file [" << file_path << "]"<< std::endl;
         t_formation.reset();
         return t_formation;
     }
@@ -167,8 +240,9 @@ void updatePositionOf(PlayerAgent* agent,Formation::Ptr formation)
   
     if(p_positions[unum-1].x<=50 && p_positions[unum-1].x>=-50 )
     {  double maxDashPower=ServerParam::i().maxDashPower();
-
+    #ifdef MYDEBUG
     cout<<"positions of "<<unum<<" is "<<p_positions[unum-1]<<endl;
+    #endif
        Body_GoToPoint( p_positions[unum-1], 1,maxDashPower ).execute( agent );      
      }   
     
@@ -211,11 +285,7 @@ void givePass(PlayerAgent * agent ,int passTaker,int passReceiver )
            cout<<"Distance :"<<distance<<endl;
            cout<<PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;
             #endif
-           #ifdef DEBUGDRAW
-            agent->debugClient().addCircle( Vector2D(0.0,0.0), 20.0 );
-            agent->debugClient().addCircle( receiver_pos, 5.0 );
-            agent->debugClient().addCircle( receiver_pos, 30.0 );
-            #endif
+
         }
         }
 
@@ -915,13 +985,13 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
 
     }
 
-    makeDribble(this,Vector2D(40,0),7,0.75);
+    //makeDribble(this,Vector2D(40,0),7,0.75);
     if ( kickable && !Opponenthasball)
     {
      //    doKick( this);
       //  givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
       //   giveThrough(this,world().self().unum(),10);
-
+        passAttack(this);
         
     }
 
@@ -935,9 +1005,10 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
          || world().audioMemory().pass().front().receiver_ != world().self().unum()
          || ((SamplePlayer*)agent)->lastRole=="Passer"))*/
         // if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_== world().self().unum())
-       //   runThrough(this);
-       //    if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_!= world().self().unum())
-         if(world().self().unum()!=7)
+         runThrough(this);
+         if(world().audioMemory().pass().empty())
+            updatePositionOf(agent,o_formation);
+         else if(world().audioMemory().pass().front().receiver_!= world().self().unum())
           updatePositionOf(agent,o_formation);
         }
 
