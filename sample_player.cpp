@@ -77,7 +77,7 @@
 #include <rcsc/player/say_message_builder.h>
 #include <rcsc/player/audio_sensor.h>
 #include <rcsc/player/freeform_parser.h>
- #include <rcsc/player/free_message.h>
+#include <rcsc/player/debug_client.h>
  
 #include "bhv_chain_action.h"
 #include <rcsc/action/body_advance_ball.h>
@@ -110,15 +110,84 @@ using namespace std;
 /*!
 
  */
+#define DEBUGDRAW
+const string ATTACK_FORMATION_CONF = "offense-formation.conf";
+//followDribbler 
+Formation::Ptr o_formation;
+vector<Vector2D > p_positions;
+Formation::Ptr  getFormation()
+{
+
+   Formation::Ptr t_formation;
+   const string & file_path="formations-dt/offense-formation.conf";
+   ifstream fin( file_path.c_str() );
+   if ( ! fin.is_open() )
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':'
+                  << " ***ERROR*** failed to open file [" << file_path << "]"
+                  << std::endl;
+        return t_formation;
+    }
+
+     t_formation=Formation::create(string("DelaunayTriangulation"));
+    if ( ! t_formation->read( fin ) )
+    {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':'
+                  << " ***ERROR*** failed to read formation [" << file_path << "]"
+                  << std::endl;
+        t_formation.reset();
+        return t_formation;
+    }
+
+    return t_formation;
+}
 
 
+void updatePositionOf(PlayerAgent* agent,Formation::Ptr formation)
+{
+     int unum=agent->world().self().unum();
+    int ball_step = 0;
+    if ( agent->world().gameMode().type() == GameMode::PlayOn || agent->world().gameMode().type() == GameMode::GoalKick_ )
+    {
+        ball_step = std::min( 1000, agent->world().interceptTable()->teammateReachCycle() );
+        ball_step = std::min( ball_step, agent->world().interceptTable()->opponentReachCycle() );
+        ball_step = std::min( ball_step, agent->world().interceptTable()->selfReachCycle() );
+    }
+
+    Vector2D ball_pos = agent->world().ball().inertiaPoint( ball_step);
+    p_positions.clear();
+     formation::SampleDataSet::Ptr s_data=formation->samples();
+     if(!s_data || !formation)
+     {
+        std::cerr << __FILE__ << ':' << __LINE__ << ':'<<"SampleDataSet or Formation is NULL"<<endl;
+        return;
+     }
+    formation->getPositions(ball_pos, p_positions );
+
+  
+    if(p_positions[unum-1].x<=50 && p_positions[unum-1].x>=-50 )
+    {  double maxDashPower=ServerParam::i().maxDashPower();
+
+    cout<<"positions of "<<unum<<" is "<<p_positions[unum-1]<<endl;
+       Body_GoToPoint( p_positions[unum-1], 1,maxDashPower ).execute( agent );      
+     }   
+    
+
+        
+    //cout<<"positions of ball for "<<unum<<" is "<<formation->samples()>ball_<<endl;
+   
+}
+
+
+/*
 void takeShoot(PlayerAgent * agent)
 {
 
 }
+*/
 void givePass(PlayerAgent * agent ,int passTaker,int passReceiver )
 {
-  const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+//  const double dash_power = Strategy::get_normal_dash_power( agent->world() );
   const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);
             if(!receiver)return;
   const Vector2D receiver_pos =receiver->pos()+receiver->vel();
@@ -142,6 +211,11 @@ void givePass(PlayerAgent * agent ,int passTaker,int passReceiver )
            cout<<"Distance :"<<distance<<endl;
            cout<<PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;
             #endif
+           #ifdef DEBUGDRAW
+            agent->debugClient().addCircle( Vector2D(0.0,0.0), 20.0 );
+            agent->debugClient().addCircle( receiver_pos, 5.0 );
+            agent->debugClient().addCircle( receiver_pos, 30.0 );
+            #endif
         }
         }
 
@@ -159,30 +233,21 @@ void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
         {
         bool kickable = agent->world().self().isKickable();
        
-        if(dribbler->pos().dist(point)>10)
-        {
+      
             if(kickable)
             {
              Body_TurnToPoint( point ).execute( agent );
              Body_KickOneStep(point,power).execute( agent);
             }
             else
-            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );         
+            Body_GoToPoint( agent->world().ball().pos(), power, 100.0).execute( agent );         
            
-        }
-        else if(!kickable){
-            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );
-        }
+       
         
         }
          
 }
 
-void followDribbler(PlayerAgent * agent)
-{
-
-
-}
 void giveThrough(PlayerAgent * agent,int unum,double approxDist)
 {
     const WorldModel & wm = agent->world();
@@ -447,6 +512,7 @@ SamplePlayer::actionImpl()
 
     if ( world().gameMode().type() == GameMode::KickOff_)
     {   
+        o_formation=getFormation();
         mpIntransit = false;
         if(wm.self().unum()==10){
             mpIntransit = true;
@@ -465,7 +531,7 @@ SamplePlayer::actionImpl()
         if ( kickable )
         {
           //   giveThrough(this,wm.self().unum(),10);
-	       givePass(this,wm.self().unum(),wm.teammatesFromSelf().front()->unum());
+	       givePass(this,wm.self().unum(),7);
             //Bhv_BasicMove().execute(this);
           //  Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
@@ -789,7 +855,8 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
         Body_GoToPoint( Vector2D(-50,0), 0.0, ServerParam::i().maxDashPower(), -1, 4, true, 60).execute( agent );
         return true;
     }
-
+    
+    
     //Setting up of different flags.
 
     bool kickable = agent->world().self().isKickable();
@@ -847,11 +914,12 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
       }      
 
     }
-        //makeDribble(this,Vector2D(-10,0),world().self().unum(),1);
+
+    makeDribble(this,Vector2D(40,0),7,0.75);
     if ( kickable && !Opponenthasball)
     {
      //    doKick( this);
-        givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
+      //  givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
       //   giveThrough(this,world().self().unum(),10);
 
         
@@ -863,8 +931,14 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
         
          
           //   doMove(this);
-       
-          runThrough(this);
+         /* if (!(  world().audioMemory().pass().empty()
+         || world().audioMemory().pass().front().receiver_ != world().self().unum()
+         || ((SamplePlayer*)agent)->lastRole=="Passer"))*/
+        // if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_== world().self().unum())
+       //   runThrough(this);
+       //    if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_!= world().self().unum())
+         if(world().self().unum()!=7)
+          updatePositionOf(agent,o_formation);
         }
 
     //ATTACK ENDS HERE

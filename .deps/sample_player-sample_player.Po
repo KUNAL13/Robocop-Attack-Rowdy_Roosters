@@ -449,14 +449,13 @@ sample_player-sample_player.o: sample_player.cpp \
  /usr/local/include/rcsc/player/audio_sensor.h \
  /usr/local/include/rcsc/common/audio_message.h \
  /usr/local/include/rcsc/player/freeform_parser.h \
- /usr/local/include/rcsc/player/free_message.h \
- /usr/local/include/rcsc/common/audio_memory.h \
  ../src/chain_action/bhv_chain_action.h \
  /usr/local/include/rcsc/action/body_advance_ball.h \
  /usr/local/include/rcsc/action/body_advance_ball2009.h \
  /usr/local/include/rcsc/action/body_pass.h \
  /usr/local/include/rcsc/common/basic_client.h \
  /usr/local/include/rcsc/common/player_param.h \
+ /usr/local/include/rcsc/common/audio_memory.h \
  /usr/local/include/rcsc/param/param_map.h \
  /usr/include/boost/lexical_cast.hpp \
  /usr/include/boost/detail/lcast_precision.hpp \
@@ -1844,10 +1843,6 @@ intention_receive.h:
 
 /usr/local/include/rcsc/player/freeform_parser.h:
 
-/usr/local/include/rcsc/player/free_message.h:
-
-/usr/local/include/rcsc/common/audio_memory.h:
-
 ../src/chain_action/bhv_chain_action.h:
 
 /usr/local/include/rcsc/action/body_advance_ball.h:
@@ -1859,6 +1854,8 @@ intention_receive.h:
 /usr/local/include/rcsc/common/basic_client.h:
 
 /usr/local/include/rcsc/common/player_param.h:
+
+/usr/local/include/rcsc/common/audio_memory.h:
 
 /usr/local/include/rcsc/param/param_map.h:
 
