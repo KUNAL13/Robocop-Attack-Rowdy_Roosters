@@ -1012,19 +1012,19 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     {   
         
          
-        doMove(this);
+      //  doMove(this);
          /* if (!(  world().audioMemory().pass().empty()
          || world().audioMemory().pass().front().receiver_ != world().self().unum()
          || ((SamplePlayer*)agent)->lastRole=="Passer"))*/
        // if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_== world().self().unum())
-       /*runThrough(this);
+       runThrough(this);
 
          
          if(world().audioMemory().pass().empty())
             updatePositionOf(agent,o_formation);
          else if(world().audioMemory().pass().front().receiver_!= world().self().unum())
           updatePositionOf(agent,o_formation);
-        */
+        
 
 
   }
