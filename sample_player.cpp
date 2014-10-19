@@ -179,7 +179,7 @@ void passAttack(PlayerAgent * agent)
             if(i==11)
             {
                 canPass=true;
-                bestPlayer=current;
+                bestPlayer=current ; 
             }
 
         }
