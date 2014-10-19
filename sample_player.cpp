@@ -121,6 +121,7 @@ vector<Vector2D > p_positions;
 void givePass(PlayerAgent * agent ,int passTaker,int passReceiver );
 void passAttack(PlayerAgent * agent)
 {
+
     const double max_speed_ballplayer=ServerParam::i().ballSpeedMax()/ServerParam::i().defaultPlayerSpeedMax();
  
     const WorldModel& wm=agent->world();
@@ -166,29 +167,37 @@ void passAttack(PlayerAgent * agent)
     bool canPass=false;
     while(!passPriority.empty() && !bestPlayer)
     {
+         cout<<"Checking pass of Player "<<passPriority.top().second->unum()<<endl;
         PlayerObject* current=passPriority.top().second;
         for(int i=1;i<12;i++)
         {
             Vector2D opp_pos;
             Vector2D cur_pos=current->pos();
             opp_pos=oppCapturedCircle[i].second->pos();
-            if(pow((opp_pos.x-cur_pos.x),2)+pow((opp_pos.y-cur_pos.y),2)<=pow(ourCapturedCircle[i].first,2))
+            if(pow((opp_pos.x-cur_pos.x),2)+pow((opp_pos.y-cur_pos.y),2)<=pow(oppCapturedCircle[i].first,2))
             {
                 break;
+               cout<<"Player "<<bestPlayer->unum()<<"Can be tacked..."<<endl;
+
             }
             if(i==11)
             {
-                canPass=true;
+
+              
                 bestPlayer=current ; 
+                if(bestPlayer)
+                canPass=true;
             }
 
         }
+        if(canPass==false)
+        passPriority.pop();    
 
     }
-    if(canPass)
-    cout<<bestPlayer->unum()<<endl;
+    
     if(canPass)
     {
+        cout<<"Giving Best Pass to Player "<<bestPlayer->unum()<<endl;
         givePass(agent,agent->world().self().unum(),bestPlayer->unum());
     }
     
@@ -604,7 +613,7 @@ SamplePlayer::actionImpl()
         if ( kickable )
         {
           //   giveThrough(this,wm.self().unum(),10);
-	       givePass(this,wm.self().unum(),7);
+	       givePass(this,wm.self().unum(),8);
             //Bhv_BasicMove().execute(this);
           //  Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
@@ -991,10 +1000,10 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //makeDribble(this,Vector2D(40,0),7,0.75);
     if ( kickable && !Opponenthasball)
     {
-     //    doKick( this);
-      //  givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
+       //  doKick( this);
+       // givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
       //   giveThrough(this,world().self().unum(),10);
-        passAttack(this);
+     passAttack(this);
         
     }
 
@@ -1003,17 +1012,22 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     {   
         
          
-          //   doMove(this);
+        doMove(this);
          /* if (!(  world().audioMemory().pass().empty()
          || world().audioMemory().pass().front().receiver_ != world().self().unum()
          || ((SamplePlayer*)agent)->lastRole=="Passer"))*/
-        // if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_== world().self().unum())
-         runThrough(this);
+       // if(!world().audioMemory().pass().empty() && world().audioMemory().pass().front().receiver_== world().self().unum())
+       /*runThrough(this);
+
+         
          if(world().audioMemory().pass().empty())
             updatePositionOf(agent,o_formation);
          else if(world().audioMemory().pass().front().receiver_!= world().self().unum())
           updatePositionOf(agent,o_formation);
-        }
+        */
+
+
+  }
 
     //ATTACK ENDS HERE
     //--------XX----------XX--------//
