@@ -187,7 +187,10 @@ void passAttack(PlayerAgent * agent)
     }
     if(canPass)
     cout<<bestPlayer->unum()<<endl;
-    cout<<"-----------------in"<<endl;
+    if(canPass)
+    {
+        givePass(agent,agent->world().self().unum(),bestPlayer->unum());
+    }
     
 
 }
