@@ -4,6 +4,30 @@
 		"selected_items":
 		[
 			[
+				"passt",
+				"passTime"
+			],
+			[
+				"p",
+				"pass_point"
+			],
+			[
+				"re",
+				"receiver_"
+			],
+			[
+				"Pass",
+				"PassMessage"
+			],
+			[
+				"te",
+				"tellMe"
+			],
+			[
+				"rece",
+				"receiver_"
+			],
+			[
 				"r",
 				"receiver_"
 			],
@@ -18,10 +42,6 @@
 			[
 				"team",
 				"teammate"
-			],
-			[
-				"re",
-				"return"
 			],
 			[
 				"op",
@@ -84,33 +104,6 @@
 	"buffers":
 	[
 		{
-			"file": "/usr/local/include/rcsc/player/world_model.h",
-			"settings":
-			{
-				"buffer_size": 48607,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "\n/*\n *Copyright:\n\n Copyright (C) Hidehisa AKIYAMA\n\n This code is free software; you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation; either version 3, or (at your option)\n any later version.\n\n This code is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n\n You should have received a copy of the GNU General Public License\n along with this code; see the file COPYING.  If not, write to\n the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.\n\n *EndCopyright:\n */\n\n/////////////////////////////////////////////////////////////////////\n\n//bin/rione_player -team Ri-one -f conf/formations.conf -c conf/player.conf -num 1\n\n\n#ifdef HAVE_CONFIG_H\n#include <config.h>\n#endif\n\n#include \"sample_player.h\"\n\n#include \"strategy.h\"\n#include \"field_analyzer.h\"\n\n#include \"action_chain_holder.h\"\n#include \"sample_field_evaluator.h\"\n\n#include \"soccer_role.h\"\n\n#include \"sample_communication.h\"\n#include \"keepaway_communication.h\"\n\n#include \"bhv_penalty_kick.h\"\n#include \"bhv_set_play.h\"\n#include \"bhv_set_play_kick_in.h\"\n#include \"bhv_set_play_indirect_free_kick.h\"\n#include \"bhv_basic_move.h\" \n\n#include \"bhv_custom_before_kick_off.h\"\n#include \"bhv_strict_check_shoot.h\"\n\n#include \"view_tactical.h\"\n\n#include \"intention_receive.h\"\n\n#include <rcsc/action/basic_actions.h>\n#include <rcsc/action/bhv_emergency.h>\n#include <rcsc/action/body_go_to_point.h>\n#include <rcsc/action/body_intercept.h>\n#include <rcsc/action/body_smart_kick.h>\n#include <rcsc/action/body_kick_one_step.h>\n#include <rcsc/action/body_kick_to_relative.h>\n \n#include <rcsc/action/neck_scan_field.h>\n#include <rcsc/action/neck_turn_to_ball_or_scan.h>\n#include <rcsc/action/neck_turn_to_point.h> \n#include <rcsc/action/view_synch.h>\n#include <rcsc/action/body_hold_ball.h>\n#include <rcsc/action/body_dribble.h>\n\n#include <rcsc/formation/formation.h>\n#include <rcsc/action/kick_table.h>\n#include <rcsc/player/intercept_table.h>\n#include <rcsc/player/say_message_builder.h>\n#include <rcsc/player/audio_sensor.h>\n#include <rcsc/player/freeform_parser.h>\n#include \"bhv_chain_action.h\"\n#include <rcsc/action/body_advance_ball.h>\n#include <rcsc/action/body_dribble.h>\n#include <rcsc/action/body_hold_ball.h>\n#include <rcsc/action/body_pass.h>\n#include <rcsc/action/neck_scan_field.h>\n#include <rcsc/action/neck_turn_to_low_conf_teammate.h>\n#include <rcsc/common/basic_client.h>\n#include <rcsc/common/logger.h>\n#include <rcsc/common/server_param.h>\n#include <rcsc/common/player_param.h>\n#include <rcsc/common/audio_memory.h>\n#include <rcsc/common/say_message_parser.h>\n// #include <rcsc/common/free_message_parser.h>\n\n\n#include <rcsc/param/param_map.h>\n#include <rcsc/param/cmd_line_parser.h>\n\n#include <iostream>\n#include <sstream>\n#include <string>\n#include <cstdlib>\n#include <vector> \n\nusing namespace rcsc;\nusing namespace std;\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid takeShoot(PlayerAgent * agent)\n{\n\n}\nvoid takePass(PlayerAgent * agent ,int passTaker,int passReceiver )\n{\n  const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n  const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);\n            if(!receiver)return;\n  const Vector2D receiver_pos =receiver->pos()+receiver->vel();\n\n    if(agent->world().self().unum()==passTaker)\n        {\n\n         if( agent->world().self().isKickable())\n        {\n \n           double ballspeed=ServerParam::i().ballSpeedMax();\n            double distance=(double) receiver_pos.dist(agent->world().self().pos());\n        \n            cout<<\"##########################\"<<distance<<\"##########################\"<<endl;\n\n            Body_TurnToPoint( receiver_pos ).execute( agent );\n         //   if(distance>30)\n          //  Body_SmartKick( receiver_pos,ballspeed,ballspeed*0.96,3 ).execute( agent );\n          //   else\n            Body_KickOneStep( receiver_pos,ballspeed*(distance/30)).execute( agent);\n         //   Body_KickToRelative(distance,180,true).execute(agent);\n\n            Vector2D ball_vel( 0.0, 0.0 );\n            if ( ! agent->effector().queuedNextBallKickable() )\n            ball_vel = agent->effector().queuedNextBallVel();\n     \n            agent->addSayMessage( \n                new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel) \n                );     \n    \n    \n        }\n        }\n\n        \n\n}\nvoid makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)\n{\n        const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);\n        const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n        if(!dribbler)return;\n        if(agent->world().self().unum()==unum)\n        {\n        bool kickable = agent->world().self().isKickable();\n       \n        if(dribbler->pos().dist(point)>10)\n        {\n            if(kickable)\n            {\n             Body_TurnToPoint( point ).execute( agent );\n             Body_KickOneStep(point,power).execute( agent);\n            }\n            else\n            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );         \n           \n        }\n        else if(!kickable){\n            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );\n        }\n        \n        }\n         \n}\n\nvoid followDribbler(PlayerAgent * agent)\n{\n\n\n}\nvoid giveThrough(PlayerAgent * agent,int unum,double approxDist)\n{\n    const WorldModel & wm = agent->world();\n      const PlayerObject * teammate=wm.getTeammateNearestToSelf(1);\n   if(!teammate)\n       return;\n\n     if( wm.self().isKickable())\n        {\n            Vector2D pass_point(0.0,0.0);\n           pass_point=teammate->pos()+Vector2D(approxDist,0.0);\n           double ballspeed=ServerParam::i().ballSpeedMax();\n           double distance=(double) pass_point.dist(agent->world().self().pos());\n           Body_TurnToPoint(  pass_point ).execute( agent );\n           Body_KickOneStep(  pass_point,ballspeed*(distance/30)).execute( agent);\n           Vector2D ball_vel( 0.0, 0.0 );\n           if ( ! agent->effector().queuedNextBallKickable() )\n           ball_vel = agent->effector().queuedNextBallVel();\n  \n           const PassMessage* mes=new PassMessage( teammate->unum(),pass_point ,agent->effector().queuedNextBallPos(),ball_vel);\n            agent->addSayMessage(mes);    \n\n       \n        }\n\n}\nvoid runThrough(PlayerAgent * agent)\n{\n       const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();\n       if(!M_pass.empty() && M_pass.front().receiver_==agent->world().self().unum() )\n            {    \n\n            const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n            double distance= agent->world().ball().pos().dist(agent->world().self().pos());\n             cout<<\"#################\"<<M_pass.heaer().sender_<<\"#########\"<<\n             agent->world().self().unum()<<\"##########################\"<<endl;\n        \n            Body_GoToPoint(agent->effector().queuedNextBallPos(), 1, dash_power).\n            execute( agent );\n\n          // \n            }\n\n}\nSamplePlayer::SamplePlayer()\n    : PlayerAgent(),\n      M_communication(),\n      M_field_evaluator( createFieldEvaluator() ),\n      M_action_generator( createActionGenerator() )\n{\n    boost::shared_ptr< AudioMemory > audio_memory( new AudioMemory );\n\n    M_worldmodel.setAudioMemory( audio_memory );\n\n    //\n    // set communication message parser\n    //\n    addSayMessageParser( SayMessageParser::Ptr( new BallMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new PassMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new InterceptMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new GoalieMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new GoalieAndPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OffsideLineMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new DefenseLineMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new WaitRequestMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new PassRequestMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new DribbleMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new BallGoalieMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OnePlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new TwoPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new ThreePlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new SelfMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new TeammateMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OpponentMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new BallPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new StaminaMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new RecoveryMessageParser( audio_memory ) ) );\n\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 9 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 8 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 7 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 6 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 5 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 4 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 3 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 2 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 1 >( audio_memory ) ) );\n\n    //\n    // set freeform message parser\n    //\n    setFreeformParser( FreeformParser::Ptr( new FreeformParser( M_worldmodel ) ) );\n\n    //\n    // set action generators\n    //\n    // M_action_generators.push_back( ActionGenerator::Ptr( new PassGenerator() ) );\n\n    //\n    // set communication planner\n    //\n    M_communication = Communication::Ptr( new SampleCommunication() );\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nSamplePlayer::~SamplePlayer()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nbool\nSamplePlayer::initImpl( CmdLineParser & cmd_parser )\n{\n    bool result = PlayerAgent::initImpl( cmd_parser );\n\n    // read additional options\n    result &= Strategy::instance().init( cmd_parser );\n\n    rcsc::ParamMap my_params( \"Additional options\" );\n#if 0\n    std::string param_file_path = \"params\";\n    param_map.add()\n        ( \"param-file\", \"\", &param_file_path, \"specified parameter file\" );\n#endif\n\n    cmd_parser.parse( my_params );\n\n    if ( cmd_parser.count( \"help\" ) > 0 )\n    {\n        my_params.printHelp( std::cout );\n        return false;\n    }\n\n    if ( cmd_parser.failed() )\n    {\n        std::cerr << \"player: ***WARNING*** detected unsuppprted options: \";\n        cmd_parser.print( std::cerr );\n        std::cerr << std::endl;\n    }\n\n    if ( ! result )\n    {\n        return false;\n    }\n\n    if ( ! Strategy::instance().read( config().configDir() ) )\n    {\n        std::cerr << \"***ERROR*** Failed to read team strategy.\" << std::endl;\n        return false;\n    }\n\n    if ( KickTable::instance().read( config().configDir() + \"/kick-table\" ) )\n    {\n        std::cerr << \"Loaded the kick table: [\"\n                  << config().configDir() << \"/kick-table]\"\n                  << std::endl;\n    }\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n  main decision\n  virtual method in super class\n*/\nvoid\nSamplePlayer::actionImpl()\n{\n    //\n    // update strategy and analyzer\n    //\n    Strategy::instance().update( world() );\n    FieldAnalyzer::instance().update( world() );\n\n    //\n    // prepare action chain\n    //\n    M_field_evaluator = createFieldEvaluator();\n    M_action_generator = createActionGenerator();\n\n    ActionChainHolder::instance().setFieldEvaluator( M_field_evaluator );\n    ActionChainHolder::instance().setActionGenerator( M_action_generator );\n\n    //\n    // special situations (tackle, objects accuracy, intention...)\n    //\n    const WorldModel & wm = this->world();\n\n    if ( doPreprocess() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": preprocess done\" );\n        return;\n    }\n\n    //\n    // update action chain\n    //\n    ActionChainHolder::instance().update( world() );\n\n    //\n    // create current role\n    //\n    std::string role_name;\n    SoccerRole::Ptr role_ptr;\n    {\n        role_ptr = Strategy::i().createRole( world().self().unum(), world() );\n        role_name = Strategy::i().getRoleName( world().self().unum(), world() );\n\n        if ( ! role_ptr )\n        {\n            std::cerr << config().teamName() << \": \"\n                      << world().self().unum()\n                      << \" Error. Role is not registerd.\\nExit ...\"\n                      << std::endl;\n            M_client->setServerAlive( false );\n            return;\n        }\n    }\n\n    //\n    // override execute if role accept\n    //\n    if ( role_ptr->acceptExecution( world() ) )\n    {\n        if(role_name==\"Sample\"){\n            executeSampleRole(this);\n            return;\n        }\n        role_ptr->execute( this );\n        return;\n    }\n\n    //\n    // play_on mode\n    //\n    if ( world().gameMode().type() == GameMode::PlayOn )\n    {\n        if(role_name==\"Sample\"){\n            executeSampleRole(this);\n            return;\n        }\n        role_ptr->execute( this );\n        return;\n    }\n\n    if ( world().gameMode().type() == GameMode::KickOff_)\n    {   \n        mpIntransit = false;\n        if(wm.self().unum()==10){\n            mpIntransit = true;\n            mpTarget = wm.ball().pos();\n        }\n        bool kickable = this->world().self().isKickable();\n        if ( this->world().existKickableTeammate()\n             && this->world().teammatesFromBall().front()->distFromBall()\n             < this->world().ball().distFromSelf() )\n        {\n            kickable = false;\n        }\n\n      // takePass(this,wm.self().unum(),1);//world().teammatesFromSelf().front()->unum());\n        if ( kickable )\n        {\n      giveThrough(this,wm.self().unum(),20);\n	   \n            //Bhv_BasicMove().execute(this);\n          //  Bhv_BasicOffensiveKick().execute(this);\n        //    if(!PassToBestPlayer( this )){\n        //        Body_HoldBall().execute( this );\n            //    doKick( this);\n                //Bhv_BasicOffensiveKick().execute(this);\n               // PassToBestPlayer(this);   \n            //f}                \n        }\n        else\n        {\n            Bhv_BasicMove().execute(this);\n        }\n        return;\n    }\n\n    //\n    // penalty kick mode\n    //\n    if ( world().gameMode().isPenaltyKickMode() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": penalty kick\" );\n        Bhv_PenaltyKick().execute( this );\n        return;\n    }\n\n    //\n    // other set play mode\n    //\n\n    if(role_name==\"Sample\"){\n        executeSampleRole(this);\n        return;\n    }\n}\n\n\n\n/*--------------------------------------------------------------------------*/\n\nbool\nSamplePlayer::SampleDribble( PlayerAgent * agent )\n{\n    const WorldModel & wm = agent->world();\n\n    const PlayerPtrCont & opps = wm.opponentsFromSelf();\n    const PlayerObject * nearest_opp\n        = ( opps.empty()\n            ? static_cast< PlayerObject * >( 0 )\n            : opps.front() );\n    const double nearest_opp_dist = ( nearest_opp\n                                      ? nearest_opp->distFromSelf()\n                                      : 1000.0 );\n    const Vector2D nearest_opp_pos = ( nearest_opp\n                                       ? nearest_opp->pos()\n                                       : Vector2D( -1000.0, 0.0 ) );\n\n    Vector2D pass_point;\n\n    if ( Body_Pass::get_best_pass( wm, &pass_point, NULL, NULL ) )\n    {\n        if ( pass_point.x > wm.self().pos().x - 1.0 )\n        {\n            bool safety = true;\n            const PlayerPtrCont::const_iterator opps_end = opps.end();\n            for ( PlayerPtrCont::const_iterator it = opps.begin();\n                  it != opps_end;\n                  ++it )\n            {\n                if ( (*it)->pos().dist( pass_point ) < 4.0 )\n                {\n                    safety = false;\n                }\n            }\n\n            if ( safety )\n            {\n                Body_Pass().execute( agent );\n                agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n                return true;\n            }\n        }\n    }\n\n    if ( nearest_opp_dist < 3.0 )\n    {\n        if ( Body_Pass().execute( agent ) )\n        {\n            agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n            return true;\n        }\n    }\n\n    // dribble to my body dir\n    if ( nearest_opp_dist < 5.0\n         && nearest_opp_dist > ( ServerParam::i().tackleDist()\n                                 + ServerParam::i().defaultPlayerSpeedMax() * 1.5 )\n         && wm.self().body().abs() < 70.0 )\n    {\n        const Vector2D body_dir_drib_target\n            = wm.self().pos()\n            + Vector2D::polar2vector(5.0, wm.self().body());\n\n        int max_dir_count = 0;\n        wm.dirRangeCount( wm.self().body(), 20.0, &max_dir_count, NULL, NULL );\n\n        if ( body_dir_drib_target.x < ServerParam::i().pitchHalfLength() - 1.0\n             && body_dir_drib_target.absY() < ServerParam::i().pitchHalfWidth() - 1.0\n             && max_dir_count < 3\n             )\n        {\n            // check opponents\n            // 10m, +-30 degree\n            const Sector2D sector( wm.self().pos(),\n                                   0.5, 10.0,\n                                   wm.self().body() - 30.0,\n                                   wm.self().body() + 30.0 );\n            // opponent check with goalie\n            if ( ! wm.existOpponentIn( sector, 10, true ) )\n            {\n                Body_Dribble( body_dir_drib_target,\n                              1.0,\n                              ServerParam::i().maxDashPower(),\n                              2\n                              ).execute( agent );\n                agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n                return true;\n            }\n        }\n    }\n\n    Vector2D drib_target( 50.0, wm.self().pos().absY() );\n    if ( drib_target.y < 20.0 ) drib_target.y = 20.0;\n    if ( drib_target.y > 29.0 ) drib_target.y = 27.0;\n    if ( wm.self().pos().y < 0.0 ) drib_target.y *= -1.0;\n    const AngleDeg drib_angle = ( drib_target - wm.self().pos() ).th();\n\n    // opponent is behind of me\n    if ( nearest_opp_pos.x < wm.self().pos().x + 1.0 )\n    {\n        // check opponents\n        // 15m, +-30 degree\n        const Sector2D sector( wm.self().pos(),\n                               0.5, 15.0,\n                               drib_angle - 30.0,\n                               drib_angle + 30.0 );\n        // opponent check with goalie\n        if ( ! wm.existOpponentIn( sector, 10, true ) )\n        {\n            const int max_dash_step\n                = wm.self().playerType()\n                .cyclesToReachDistance( wm.self().pos().dist( drib_target ) );\n            if ( wm.self().pos().x > 35.0 )\n            {\n                drib_target.y *= ( 10.0 / drib_target.absY() );\n            }\n            Body_Dribble( drib_target,\n                          1.0,\n                          ServerParam::i().maxDashPower(),\n                          std::min( 5, max_dash_step )\n                          ).execute( agent );\n        }\n        else\n        {\n            Body_Dribble( drib_target,\n                          1.0,\n                          ServerParam::i().maxDashPower(),\n                          2\n                          ).execute( agent );\n\n        }\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    // opp is far from me\n    if ( nearest_opp_dist > 2.5 )\n    {\n        Body_Dribble( drib_target,\n                      1.0,\n                      ServerParam::i().maxDashPower(),\n                      1\n                      ).execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    // opp is near\n\n    if ( Body_Pass().execute( agent ) )\n    {\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n\n    // opp is far from me\n    if ( nearest_opp_dist > 3.0 )\n    {\n        Body_Dribble( drib_target,\n                      1.0,\n                      ServerParam::i().maxDashPower(),\n                      1\n                      ).execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    \n    if ( nearest_opp_dist > 2.5 )\n    {\n        Body_HoldBall().execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n    \n\n    {\n        Body_AdvanceBall().execute( agent );\n        agent->setNeckAction( new Neck_ScanField() );\n    }\n\n    return true;\n}\n\n/*bool \nSamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){\n    const WorldModel & wm = agent->world();\n\n    Vector2D myPosition = wm.self().pos();\n    Vector2D currentHole = RoundToNearestHole(myPosition);\n    Vector2D frontup = Vector2D(currentHole.x+10, currentHole.y-10);\n    Vector2D backup = Vector2D(currentHole.x-10, currentHole.y-10);\n    Vector2D frontdown = Vector2D(currentHole.x+10, currentHole.y+10);\n    Vector2D backdown = Vector2D(currentHole.x-10, currentHole.y+10);\n\n    Vector2D fronthor = Vector2D(currentHole.x+20, currentHole.y);\n    Vector2D backhor = Vector2D(currentHole.x-20, currentHole.y);\n    Vector2D upvert = Vector2D(currentHole.x, currentHole.y-20);\n    Vector2D downvert = Vector2D(currentHole.x, currentHole.y+20);\n    \n    double buffer = 2.5;\n    \n    //TODO: Return true only if pass is advantageous\n    \n    if( IsOccupiedForPassing(agent, frontup, buffer)||\n        IsOccupiedForPassing(agent, frontdown, buffer)||\n        IsOccupiedForPassing(agent, backup, buffer)||\n        IsOccupiedForPassing(agent, backdown, buffer)||\n        IsOccupiedForPassing(agent, fronthor, buffer)||\n        IsOccupiedForPassing(agent, upvert, buffer)||\n        IsOccupiedForPassing(agent, downvert, buffer)||\n        IsOccupiedForPassing(agent, backhor, buffer)\n        ){\n        return true;\n    }\n\n    /*\n    const WorldModel & world = agent->world();\n    const PlayerPtrCont::const_iterator \n    t_end = world.teammatesFromSelf().end();\n    for ( PlayerPtrCont::const_iterator\n              it = world.teammatesFromSelf().begin();\n          it != t_end;\n          ++it )\n    {\n        if(((*it)->pos().dist(world.ball().pos()))<=20.0){\n            return false;\n        }  \n    }\n    \n    \n    return false;   \n}\n*/\n\nbool\nSamplePlayer::IsSectorEmpty(PlayerAgent * agent, Vector2D target, double buf_degree){\n    Neck_TurnToPoint( target ).execute(agent );\n    const WorldModel & wm = agent->world();\n    AngleDeg target_angle = (target - wm.self().pos()).dir();\n    double target_dis = wm.self().pos().dist(target);\n    const Sector2D sector( wm.self().pos(),\n                            0.5, target_dis + 4,\n                            target_angle - buf_degree,\n                            target_angle + buf_degree );\n    // opponent check without goalie\n    if ( ! wm.existOpponentIn( sector, 10, false ) )\n    {\n        return true;\n    }\n\n    return false;\n}\n\n\n\nint\nSamplePlayer::ClosestPlayerToBall(PlayerAgent * agent){\n    double mindis = 999;\n    int mindisunum = -1;\n    for(int i=2; i<=11; i++){\n        if(agent->world().ourPlayer(i)!=NULL){\n            if(agent->world().ourPlayer(i)->distFromBall() < mindis){\n                mindis = agent->world().ourPlayer(i)->distFromBall();\n                mindisunum = i;\n            }\n        }\n    }\n    return mindisunum;\n}\n\n\n//main function that will be used.\n\nbool\nSamplePlayer::executeSampleRole( PlayerAgent * agent )\n{   \n    if(agent->config().teamName()==\"opp\"){\n        Body_GoToPoint( Vector2D(-50,0), 0.0, ServerParam::i().maxDashPower(), -1, 4, true, 60).execute( agent );\n        return true;\n    }\n\n    //Setting up of different flags.\n\n    bool kickable = agent->world().self().isKickable();\n    \n    // If there is a teammate who can kick the ball and who is closer to the ball than I am.\n    if ( agent->world().existKickableTeammate()\n         && agent->world().teammatesFromBall().front()->distFromBall()\n         < agent->world().ball().distFromSelf() )\n    {\n        kickable = false;\n    }\n\n\n    if(agent->world().existKickableTeammate()){\n        //passHeard = false;\n        Opponenthasball = false;\n    }\n    else{};\n        //Opponenthasball = true;\n    \n\n    if(agent->world().existKickableOpponent()){\n        Opponenthasball = true;\n    }\n\n    //----------XX------------//\n    //If you have taken attack, you will have comment out the attach functions are replace\n    //them with your own, similarly if you have taken defense, you need to comment out the existing\n    //defence function and replace it with your own.\n    //------------xx------------//\n      \n   //  takePass(this,passer,(passer==11)?2:passer+1);\n    \n    // I have the ball, what to do?\n  //   const PlayerPtrCont & team = wm.teammatesFromSelf();\n //    const PlayerObject * nearest_team=team.front();\n\n    //makeDribble(this,Vector2D(-10,0),8,0.5);\n    setNeckAction( new Neck_TurnToBall() );\n    Bhv_BodyNeckToBall().execute(this);\n    cout<<\"$$$$$$$$$$$$\"<<agent->world().audioMemory().pass().size()<<\"$$$$$$$$$$$$\"<<endl;\n    if ( kickable && !Opponenthasball)\n    {\n     //    doKick( this);\n      //  takePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);\n        giveThrough(this,world().self().unum(),10);\n\n        \n    }\n\n    //This is for off the ball movement which attacking, where to go for passes etc.\n    else if (!kickable && !Opponenthasball)\n    {   \n        \n         \n          //   doMove(this);\n\n          runThrough(this);\n        }\n\n    //ATTACK ENDS HERE\n    //--------XX----------XX--------//\n    // DEFENCE STARTS HERE\n    //The defense call\n    else\n    {\n        //Uncomment this for defense.\n        //If I can kick the ball, but opponent has it. Common ball.\n        if (kickable && Opponenthasball){\n            if ( Bhv_ChainAction().execute( agent ) )\n            {\n                dlog.addText( Logger::TEAM,\n                      __FILE__\": (execute) do chain action\" );\n            agent->debugClient().addMessage( \"ChainAction\" );\n            return true;\n            }\n		          \n            Bhv_BasicOffensiveKick().execute( agent );\n            return true;\n\n            }\n\n        // I don't have the ball, opponent has it, off the ball movement while defending.\n        //falling back etc.     \n        else if (!kickable && Opponenthasball){\n            Bhv_BasicMove().execute(agent);\n        }\n        return true;\n    };\n\n    //DEFENSE ENDS HERE.\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nvoid\nSamplePlayer::doKick( PlayerAgent * agent )\n{\n    \n    if ( Bhv_ChainAction().execute( agent ) )\n    {\n        return;\n    }\n\n    Bhv_BasicOffensiveKick().execute( agent );\n}\n\n\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nvoid\nSamplePlayer::doMove( PlayerAgent * agent )\n{\n        Bhv_BasicMove().execute(agent);\n        return;\n}\n\nbool\nSamplePlayer::BasicMove(PlayerAgent * agent){\n    const WorldModel & wm = agent->world();\n    \n    //-----------------------------------------------\n    // tackle\n    \n    if ( Bhv_BasicTackle( 0.8, 80.0 ).execute( agent ) )\n    {   \n        return true;\n    }\n\n    /*--------------------------------------------------------*/\n    // chase ball\n    const int self_min = wm.interceptTable()->selfReachCycle();\n    const int mate_min = wm.interceptTable()->teammateReachCycle();\n    const int opp_min = wm.interceptTable()->opponentReachCycle();\n\n    //Intercept\n    if ( ! wm.existKickableTeammate()\n         && ( self_min <= 3\n              || ( self_min <= mate_min\n                   && self_min < opp_min + 3 )\n              )\n         )\n    {\n        std::cout<<\"body intercept called for player - \"<<wm.self().unum()<<std::endl;\n\n    \n        dlog.addText( Logger::TEAM,\n                      __FILE__\": intercept\");\n        Body_Intercept().execute( agent );\n        agent->setNeckAction( new Neck_OffensiveInterceptNeck() );\n        return true;\n    }\n    \n    //Check if ball has been passed\n    /*\n    if(wm.existKickableTeammate()){\n        int CurrentBH = GetBHUnum(agent);\n        if(CurrentBH!=LastBH && CurrentBH!=-1){\n            FoundNewBH = true;\n            LastBH = CurrentBH;\n        }\n        else\n            FoundNewBH = false;\n\n        //Opponenthasball=false;\n    }\n    */\n    \n    const Vector2D target_point = Vector2D(0,0);\n    const double dash_power = ServerParam::i().maxDashPower();\n\n    double dist_thr = wm.ball().distFromSelf() * 0.1;\n    if ( dist_thr < 1.0 ) dist_thr = 1.0;\n\n    \n\n    if ( wm.existKickableOpponent()\n         && wm.ball().distFromSelf() < 18.0 )\n    {\n        agent->setNeckAction( new Neck_TurnToBall() );\n        return true;\n    }\n    else\n    {\n        agent->setNeckAction( new Neck_TurnToBallOrScan() );\n    }\n\n    return true;\n}\n\n\n\n\n\n\n//centreback\n\n\n\n\n\n\n\nbool\nSamplePlayer::isKickable(PlayerAgent * agent, int unum){\n    const WorldModel & wm = agent->world();\n    if(wm.ourPlayer(unum)!=NULL){\n        if(wm.ourPlayer(unum)->distFromBall() < ServerParam::i().defaultKickableArea()){\n            return true;\n        }\n        return false;\n    }\n    else{\n        return false;\n    }\n}\n\nbool \nSamplePlayer::AreSamePoints(Vector2D A, Vector2D B, double buffer){\n    //Check if and b are the same points +/- buffer\n    if(A.dist(B)<buffer)\n        return true;\n    return false;\n}\n\ndouble \nSamplePlayer::abs(double d){\n    if (d>0.00)\n        return d;\n    else\n        return d*(-1.00);\n}\n\n\nbool\nSamplePlayer::AreSameNos(double A, double B, double buffer){\n    if( abs(A-B) < buffer)\n        return true;\n    return false;\n}\n\n\n\ndouble DistanceBetweenPoints(double x1,double y1,double x2,double y2){\n \n        double distance = sqrt(pow((x1-x2),2)+pow((y1-y2),2));\n\n        return distance;\n    }\n\n\n\n    double AngleBetweenPoints(double x1,double y1,double x2,double y2,double x3,double y3){\n\n        double angle = acos((pow(DistanceBetweenPoints(x1,y1,x2,y2),2)+pow(DistanceBetweenPoints(x1,y1,x3,y3),2)-pow(DistanceBetweenPoints(x2,y2,x3,y3),2))/(2*DistanceBetweenPoints(x1,y1,x2,y2)*DistanceBetweenPoints(x1,y1,x3,y3)));\n        \n        return angle;\n    }\n\n    static bool compare_first(const std::pair<double,double>& i, const std::pair<double,double>& j)\n    {\n        return i.first > j.first;\n    }\n\n\n    static bool compare_second(const std::pair<double,double>& i, const std::pair<double,double>& j)\n    {\n        return i.second > j.second;\n    }\n\n    double slope(double x1,double y1,double x2,double y2){\n\n        double slope_of_line = (y2-y1)/(x2-x1);\n\n        return slope_of_line;\n    }\n\n    double constant(double x1,double y1,double slope_of_line){\n\n        return (y1-slope_of_line*x1);\n    }\n\n    double bisector_line_const(double c1,double c2,double a1,double a2){\n\n\n        return ((c2-c1)*sqrt((pow(a2,2)+1)*(pow(a1,2)+1)));\n    }\n\n    double bisector_line_x_const(double a1,double a2){\n\n        return ((a2*sqrt(pow(a1,2)+1))-(a1*sqrt(pow(a2,2)+1)));\n    }\n\n    double bisector_line_y_const(double a1,double a2){\n\n\n        return (sqrt(pow(a2,2)+1)-sqrt(pow(a1,2)+1));\n    }\n\n    double intersecting_point_x(double c1, double c2, double a, double b){\n\n        double x = ((c2*b - c1*a)/((a*a)+(b*b)));\n        \n        return x;\n    }\n\n\n\n    double intersecting_point_y(double c1, double c2, double a, double b){\n\n        double y = ((c2*a + c1*b)/((a*a)+(b*b)));\n        \n        return y;\n    } \n\n    double angle_between_two_lines(const Line2D & line1,const Line2D & line2 ){\n\n        double theta_1 = atan(line1.getB()/line1.getA()); \n    \n        double theta_2 = atan(line2.getB()/line2.getA());\n\n        return (theta_2-theta_1);\n    }\n\n\n    static\n    Line2D angle_bisectorof( const Vector2D & origin,\n                           const AngleDeg & left,\n                           const AngleDeg & right )\n      {\n          return Line2D( origin, AngleDeg::bisect( left, right ) );\n      }\n\n\n\n\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleActionStart()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleActionEnd()\n{\n    if ( world().self().posValid() )\n    {\n#if 0\n        const ServerParam & SP = ServerParam::i();\n        //\n        // inside of pitch\n        //\n\n        // top,lower\n        debugClient().addLine( Vector2D( world().ourOffenseLineX(),\n                                         -SP.pitchHalfWidth() ),\n                               Vector2D( world().ourOffenseLineX(),f\n                                         -SP.pitchHalfWidth() - 3.0 ),\n                               Vector2D( world().ourOffensePlayerLineX(),\n                                         -SP.pitchHalfWidth() ) );\n        // top,upper\n        debugClient().addLine( Vector2D( world().ourDefensePlayerLineX(),\n                                         -SP.pitchHalfWidth() - 3.0 ),\n                               Vector2D( world().ourDefensePlayerLineX(),\n                                         -SP.pitchHalfWidth() ) );\n        // bottom,lower\n        debugClient().addLine( Vector2D( world(Opponenthasball\nO).theirOffensePlayerLineX(),\n                                         +SP.pitchHalfWidth() ),\n                               Vector2D( world().theirOffensePlayerLineX(),\n                                         +SP.pitchHalfWidth() + 3.0 ) );\n        // bottom,lower\n        debugClient().addLine( Vector2D( world().theirDefensePlayerLineX(),\n                                         +SP.pitchHalfWidth() ),\n                               Vector2D( world().theirDefensePlayerLineX(),\n                                         +SP.pitchHalfWidth() + 3.0 ) );\n#else\n        // top,lower\n        debugClient().addLine( Vector2D( world().ourDefenseLineX(),\n                                         world().self().pos().y - 2.0 ),\n                               Vector2D( world().ourDefenseLineX(),\n                                         world().self().pos().y + 2.0 ) );\n\n        //\n        debugClient().addLine( Vector2D( world().offsideLineX(),\n                                         world().self().pos().y - 15.0 ),\n                               Vector2D( world().offsideLineX(),\n                                         world().self().pos().y + 15.0 ) );\n#endif\n    }\n\n    //\n    // ball position & velocity\n    //\n    dlog.addText( Logger::WORLD,\n                  \"WM: BALL pos=(%lf, %lf), vel=(%lf, %lf, r=%lf, ang=%lf)\",\n                  world().ball().pos().x,\n                  world().ball().pos().y,\n                  world().ball().vel().x,\n                  world().ball().vel().y,\n                  world().ball().vel().r(),\n                  world().ball().vel().th().degree() );\n\n\n    dlog.addText( Logger::WORLD,\n                  \"WM: SELF move=(%lf, %lf, r=%lf, th=%lf)\",\n                  world().self().lastMove().x,\n                  world().self().lastMove().y,\n                  world().self().lastMove().r(),\n                  world().self().lastMove().th().degree() );\n\n    Vector2D diff = world().ball().rpos() - world().ball().rposPrev();\n    dlog.addText( Logger::WORLD,\n                  \"WM: BALL rpos=(%lf %lf) prev_rpos=(%lf %lf) diff=(%lf %lf)\",\n                  world().ball().rpos().x,\n                  world().ball().rpos().y,\n                  world().ball().rposPrev().x,\n                  world().ball().rposPrev().y,\n                  diff.x,\n                  diff.y );\n\n    Vector2D ball_move = diff + world().self().lastMove();\n    Vector2D diff_vel = ball_move * ServerParam::i().ballDecay();\n    dlog.addText( Logger::WORLD,\n                  \"---> ball_move=(%lf %lf) vel=(%lf, %lf, r=%lf, th=%lf)\",\n                  ball_move.x,\n                  ball_move.y,\n                  diff_vel.x,\n                  diff_vel.y,\n                  diff_vel.r(),\n                  diff_vel.th().degree() );\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleServerParam()\n{\n    if ( KickTable::instance().createTables() )\n    {\n        std::cerr << world().teamName() << ' '\n                  << world().self().unum() << \": \"\n                  << \" KickTable created.\"\n                  << std::endl;\n    }\n    else\n    {\n        std::cerr << world().teamName() << ' '\n                  << world().self().unum() << \": \"\n                  << \" KickTable failed...\"\n                  << std::endl;\n        M_client->setServerAlive( false );\n    }\n\n\n    if ( ServerParam::i().keepawayMode() )\n    {\n        std::cerr << \"set Keepaway mode communication.\" << std::endl;\n        M_communication = Communication::Ptr( new KeepawayCommunication() );\n    }\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handlePlayerParam()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handlePlayerType()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n  communication decision.\n  virtual method in super class\n*/\nvoid\nSamplePlayer::communicationImpl()\n{\n    if ( M_communication )\n    {\n        M_communication->execute( this );\n    }\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n*/\nbool\nSamplePlayer::doPreprocess()\n{\n    // check tackle expires\n    // check self position accuracy\n    // ball search\n    // check queued intention\n    // check simultaneous kick\n	\n    const WorldModel & wm = this->world();\n\n    dlog.addText( Logger::TEAM,\n                  __FILE__\": (doPreProcess)\" );\n\n    //\n    // freezed by tackle effect\n    //\n        if ( wm.self().isFrozen() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": tackle wait. expires= %d\",\n                      wm.self().tackleExpires() );\n        // face neck to ball\n        this->setViewAction( new View_Tactical() );\n        this->setNeckAction( new Neck_TurnToBallOrScan() );\n        return true;\n    }\n    \n\n    //\n    // BeforeKickOff or AfterGoal. jump to the initial position\n    //\n    if ( wm.gameMode().type() == GameMode::BeforeKickOff\n         || wm.gameMode().type() == GameMode::AfterGoal_ )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": before_kick_off\" );\n        Vector2D move_point =  Strategy::i().getPosition( wm.self().unum() );\n        Bhv_CustomBeforeKickOff( move_point ).execute( this );\n        this->setViewAction( new View_Tactical() );\n        return true;\n    }\n\n    //\n    // self localization error\n    //\n    \n    if ( ! wm.self().posValid() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": invalid my pos\" );\n        Bhv_Emergency().execute( this ); // includes change view\n        return true;\n    }\n    \n\n    //\n    // ball localization error\n    //\n    \n    const int count_thr = ( wm.self().goalie()\n                            ? 10\n                            : 5 );\n    if ( wm.ball().posCount() > count_thr\n         || ( wm.gameMode().type() != GameMode::PlayOn\n              && wm.ball().seenPosCount() > count_thr + 10 ) )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": search ball\" );\n        this->setViewAction( new View_Tactical() );\n        Bhv_NeckBodyToBall().execute( this );\n        return true;\n    }\n    \n\n    //\n    // set default change view\n    //\n\n    this->setViewAction( new View_Tactical() );\n\n    //\n    // check shoot chance\n    //\n    \n    if ( doShoot() )\n    {\n        std::cout<<\"doShoot\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n\n        return true;\n    }\n    \n\n    //\n    // check queued action\n    //\n    \n    if ( this->doIntention() )\n    {   \n        std::cout<<\"doIntention------------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": do queued intention\" );\n        return true;\n    }\n\n    //\n    // check simultaneous kick\n    //\n    \n    if ( doForceKick() )\n    {   \n        std::cout<<\"doForceKick--------------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        return true;\n    }\n    \n\n    //\n    // check pass message\n    //\n    \n    if ( doHeardPassReceive() )\n    {\n        std::cout<<\"doHeardPassReceive------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        return true;\n    }\n    \n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doShoot()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.gameMode().type() != GameMode::IndFreeKick_\n         && wm.time().stopped() == 0\n         && wm.self().isKickable()\n         && Bhv_StrictCheckShoot().execute( this ) )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": shooted\" );\n\n        // reset intention\n        this->setIntention( static_cast< SoccerIntention * >( 0 ) );\n        return true;\n    }\n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doForceKick()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.gameMode().type() == GameMode::PlayOn\n         && ! wm.self().goalie()\n         && wm.self().isKickable()\n         && wm.existKickableOpponent() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": simultaneous kick\" );\n        this->debugClient().addMessage( \"SimultaneousKick\" );\n        Vector2D goal_pos( ServerParam::i().pitchHalfLength(), 0.0 );\n\n        if ( wm.self().pos().x > 36.0\n             && wm.self().pos().absY() > 10.0 )\n        {\n            goal_pos.x = 45.0;\n            dlog.addText( Logger::TEAM,\n                          __FILE__\": simultaneous kick cross type\" );\n        }\n        Body_KickOneStep( goal_pos,\n                          ServerParam::i().ballSpeedMax()\n                          ).execute( this );\n        this->setNeckAction( new Neck_ScanField() );\n        return true;\n    }\n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doHeardPassReceive()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.audioMemory().passTime() != wm.time()\n         || wm.audioMemory().pass().empty()\n         || wm.audioMemory().pass().front().receiver_ != wm.self().unum() )\n    {\n        return false;\n    }\n\n    //passHeard = true;\n\n    //Vector2D closestOppPos = wm.getOpponentNearestToSelf(5, false)->pos();\n\n    //closestOppDis = static_cast<int>(wm.self().pos().dist(closestOppPos));\n\n\n    int self_min = wm.interceptTable()->selfReachCycle();\n    Vector2D intercept_pos = wm.ball().inertiaPoint( self_min );\n    Vector2D heard_pos = wm.audioMemory().pass().front().receive_pos_;\n\n    dlog.addText( Logger::TEAM,\n                  __FILE__\":  (doHeardPassReceive) heard_pos(%.2f %.2f) intercept_pos(%.2f %.2f)\",\n                  heard_pos.x, heard_pos.y,\n                  intercept_pos.x, intercept_pos.y );\n\n    if ( ! wm.existKickableTeammate()\n         && wm.ball().posCount() <= 1\n         && wm.ball().velCount() <= 1\n         && self_min < 20\n         //&& intercept_pos.dist( heard_pos ) < 3.0 ) //5.0 )\n         )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": (doHeardPassReceive) intercept cycle=%d. intercept\",\n                      self_min );\n        this->debugClient().addMessage( \"Comm:Receive:Intercept\" );\n        Body_Intercept().execute( this );\n        this->setNeckAction( new Neck_TurnToBall() );\n    }\n    else\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": (doHeardPassReceive) intercept cycle=%d. go to receive point\",\n                      self_min );\n        this->debugClient().setTarget( heard_pos );\n        this->debugClient().addMessage( \"Comm:Receive:GoTo\" );\n        Body_GoToPoint( heard_pos,\n                    0.5,\n                        ServerParam::i().maxDashPower()\n                        ).execute( this );\n        this->setNeckAction( new Neck_TurnToBall() );\n    }\n\n    this->setIntention( new IntentionReceive( heard_pos,\n                                              ServerParam::i().maxDashPower(),\n                                              0.9,\n                                              5,\n                                              wm.time() ) );\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nFieldEvaluator::ConstPtr\nSamplePlayer::getFieldEvaluator() const\n{\n    return M_field_evaluator;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nFieldEvaluator::ConstPtr\nSamplePlayer::createFieldEvaluator() const\n{\n    return FieldEvaluator::ConstPtr( new SampleFieldEvaluator );\n}\n\n\n/*-------------------------------------------------------------------*/\n/*!\n*/\n#include \"actgen_cross.h\"\n#include \"actgen_direct_pass.h\"\n#include \"actgen_self_pass.h\"\n#include \"actgen_strict_check_pass.h\"\n#include \"actgen_short_dribble.h\"\n#include \"actgen_simple_dribble.h\"\n#include \"actgen_shoot.h\"\n#include \"actgen_action_chain_length_filter.h\"\n\nActionGenerator::ConstPtr\nSamplePlayer::createActionGenerator() const\n{\n    CompositeActionGenerator * g = new CompositeActionGenerator();\n\n    //\n    // shoot\n    //\n    g->addGenerator( new ActGen_RangeActionChainLengthFilter\n                     ( new ActGen_Shoot(),\n                       2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    //\n    // strict check pass\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_StrictCheckPass(), 1 ) );\n\n    //\n    // cross\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_Cross(), 1 ) );\n\n    //\n    // direct pass\n    //\n    // g->addGenerator( new ActGen_RangeActionChainLengthFilter\n    //                  ( new ActGen_DirectPass(),\n    //                    2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    //\n    // short dribble\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_ShortDribble(), 1 ) );\n\n    //\n    // self pass (long dribble)\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_SelfPass(), 1 ) );\n\n    //\n    // simple dribble\n    //\n    // g->addGenerator( new ActGen_RangeActionChainLengthFilter\n    //                  ( new ActGen_SimpleDribble(),\n    //                    2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    return ActionGenerator::ConstPtr( g );\n}\n\n",
-			"file": "sample_player.cpp",
-			"file_size": 48411,
-			"file_write_time": 130580457993392158,
-			"settings":
-			{
-				"buffer_size": 48304,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "chain_action/bhv_pass_kick_find_receiver.cpp",
-			"settings":
-			{
-				"buffer_size": 29622,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "/usr/local/include/rcsc/common/audio_memory.h",
 			"settings":
 			{
@@ -119,10 +112,29 @@
 			}
 		},
 		{
-			"file": "/usr/local/include/rcsc/common/say_message_parser.h",
+			"file": "/usr/local/include/rcsc/player/world_model.h",
 			"settings":
 			{
-				"buffer_size": 32387,
+				"buffer_size": 48607,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n/*\n *Copyright:\n\n Copyright (C) Hidehisa AKIYAMA\n\n This code is free software; you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation; either version 3, or (at your option)\n any later version.\n\n This code is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n\n You should have received a copy of the GNU General Public License\n along with this code; see the file COPYING.  If not, write to\n the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.\n\n *EndCopyright:\n */\n\n/////////////////////////////////////////////////////////////////////\n\n//bin/rione_player -team Ri-one -f conf/formations.conf -c conf/player.conf -num 1\n\n\n#ifdef HAVE_CONFIG_H\n#include <config.h>\n#endif\n\n#include \"sample_player.h\"\n\n#include \"strategy.h\"\n#include \"field_analyzer.h\"\n\n#include \"action_chain_holder.h\"\n#include \"sample_field_evaluator.h\"\n\n#include \"soccer_role.h\"\n\n#include \"sample_communication.h\"\n#include \"keepaway_communication.h\"\n\n#include \"bhv_penalty_kick.h\"\n#include \"bhv_set_play.h\"\n#include \"bhv_set_play_kick_in.h\"\n#include \"bhv_set_play_indirect_free_kick.h\"\n#include \"bhv_basic_move.h\" \n\n#include \"bhv_custom_before_kick_off.h\"\n#include \"bhv_strict_check_shoot.h\"\n\n#include \"view_tactical.h\"\n\n#include \"intention_receive.h\"\n\n#include <rcsc/action/basic_actions.h>\n#include <rcsc/action/bhv_emergency.h>\n#include <rcsc/action/body_go_to_point.h>\n#include <rcsc/action/body_intercept.h>\n#include <rcsc/action/body_smart_kick.h>\n#include <rcsc/action/body_kick_one_step.h>\n#include <rcsc/action/body_kick_to_relative.h>\n \n#include <rcsc/action/neck_scan_field.h>\n#include <rcsc/action/neck_turn_to_ball_or_scan.h>\n#include <rcsc/action/neck_turn_to_point.h> \n#include <rcsc/action/view_synch.h>\n#include <rcsc/action/body_hold_ball.h>\n#include <rcsc/action/body_dribble.h>\n\n#include <rcsc/formation/formation.h>\n#include <rcsc/action/kick_table.h>\n#include <rcsc/player/intercept_table.h>\n#include <rcsc/player/say_message_builder.h>\n#include <rcsc/player/audio_sensor.h>\n#include <rcsc/player/freeform_parser.h>\n #include <rcsc/player/free_message.h>\n \n#include \"bhv_chain_action.h\"\n#include <rcsc/action/body_advance_ball.h>\n#include <rcsc/action/body_dribble.h>\n#include <rcsc/action/body_hold_ball.h>\n#include <rcsc/action/body_pass.h>\n#include <rcsc/action/neck_scan_field.h>\n#include <rcsc/action/neck_turn_to_low_conf_teammate.h>\n#include <rcsc/common/basic_client.h>\n#include <rcsc/common/logger.h>\n#include <rcsc/common/server_param.h>\n#include <rcsc/common/player_param.h>\n#include <rcsc/common/audio_memory.h>\n#include <rcsc/common/say_message_parser.h>\n// #include <rcsc/common/free_message_parser.h>\n\n\n#include <rcsc/param/param_map.h>\n#include <rcsc/param/cmd_line_parser.h>\n\n#include <iostream>\n#include <sstream>\n#include <string>\n#include <cstdlib>\n#include <vector> \n#include <algorithm>   \nusing namespace rcsc;\nusing namespace std;\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid takeShoot(PlayerAgent * agent)\n{\n\n}\nvoid takePass(PlayerAgent * agent ,int passTaker,int passReceiver )\n{\n  const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n  const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);\n            if(!receiver)return;\n  const Vector2D receiver_pos =receiver->pos()+receiver->vel();\n\n    if(agent->world().self().unum()==passTaker)\n        {\n\n         if( agent->world().self().isKickable())\n        {\n \n           double ballspeed=ServerParam::i().ballSpeedMax();\n            double distance=(double) receiver_pos.dist(agent->world().self().pos());\n        \n            cout<<\"##########################\"<<distance<<\"##########################\"<<endl;\n\n            Body_TurnToPoint( receiver_pos ).execute( agent );\n         //   if(distance>30)\n          //  Body_SmartKick( receiver_pos,ballspeed,ballspeed*0.96,3 ).execute( agent );\n          //   else\n            Body_KickOneStep( receiver_pos,ballspeed*(distance/30)).execute( agent);\n         //   Body_KickToRelative(distance,180,true).execute(agent);\n\n            Vector2D ball_vel( 0.0, 0.0 );\n            if ( ! agent->effector().queuedNextBallKickable() )\n            ball_vel = agent->effector().queuedNextBallVel();\n     \n            agent->addSayMessage( \n                new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel) \n                );     \n\n            cout<<PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;\n    \n        }\n        }\n\n        \n\n}\nvoid makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)\n{\n        const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);\n        const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n        if(!dribbler)return;\n\n\n        if(agent->world().self().unum()==unum)\n        {\n        bool kickable = agent->world().self().isKickable();\n       \n        if(dribbler->pos().dist(point)>10)\n        {\n            if(kickable)\n            {\n             Body_TurnToPoint( point ).execute( agent );\n             Body_KickOneStep(point,power).execute( agent);\n            }\n            else\n            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );         \n           \n        }\n        else if(!kickable){\n            Body_GoToPoint( agent->world().ball().pos(), 1, dash_power).execute( agent );\n        }\n        \n        }\n         \n}\n\nvoid followDribbler(PlayerAgent * agent)\n{\n\n\n}\nvoid giveThrough(PlayerAgent * agent,int unum,double approxDist)\n{\n    const WorldModel & wm = agent->world();\n      const PlayerObject * teammate=wm.getTeammateNearestToSelf(1);\n   if(!teammate)\n       return;\n\n     if( wm.self().isKickable())\n        {\n      //   const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();\n       \n         \n            Vector2D pass_point(0.0,0.0);\n           pass_point=teammate->pos()+Vector2D(approxDist,0.0);\n            double ballspeed=ServerParam::i().ballSpeedMax();\n           double distance=(double) pass_point.dist(agent->world().self().pos());\n           Body_TurnToPoint(  pass_point ).execute( agent );\n           Body_KickOneStep(  pass_point,ballspeed*(distance/30)).execute( agent);\n           Vector2D ball_vel( 0.0, 0.0 );\n           if ( ! agent->effector().queuedNextBallKickable() )\n           ball_vel = agent->effector().queuedNextBallVel();\n           const ActionEffector& M_effector=agent->effector();\n           const PassMessage* mes=new PassMessage( teammate->unum(),pass_point ,M_effector.queuedNextBallPos(),ball_vel);\n           agent->addSayMessage(mes);\n\n           \n             \n        }\n\n}\nvoid runThrough(PlayerAgent * agent)\n{\n\n     const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();\n     const WorldModel & wm = agent->world();\n\n    if (  wm.audioMemory().pass().empty()\n         || wm.audioMemory().pass().front().receiver_ != wm.self().unum() )\n    {\n        return ;\n    }\n\n            const double dash_power = Strategy::get_normal_dash_power( agent->world() );\n            double distance= agent->world().ball().pos().dist(agent->world().self().pos());\n                   \n            Body_GoToPoint(agent->effector().queuedNextBallPos(), 1, dash_power).\n            execute( agent );\n/*           Vector2D ball_vel( 0.0, 0.0 );\n           Vector2D ball_pos(0.0,0.0);\n           const ActionEffector& M_effector=agent->effector();\n           ball_vel = M_effector.queuedNextBallVel();\n           ball_pos=M_effector.queuedNextBallPos();*/\n     \n      \n          // \n            \n\n}\nSamplePlayer::SamplePlayer()\n    : PlayerAgent(),\n      M_communication(),\n      M_field_evaluator( createFieldEvaluator() ),\n      M_action_generator( createActionGenerator() )\n{\n    boost::shared_ptr< AudioMemory > audio_memory( new AudioMemory );\n\n    M_worldmodel.setAudioMemory( audio_memory );\n\n    //\n    // set communication message parser\n    //\n    addSayMessageParser( SayMessageParser::Ptr( new BallMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new PassMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new InterceptMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new GoalieMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new GoalieAndPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OffsideLineMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new DefenseLineMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new WaitRequestMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new PassRequestMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new DribbleMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new BallGoalieMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OnePlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new TwoPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new ThreePlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new SelfMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new TeammateMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new OpponentMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new BallPlayerMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new StaminaMessageParser( audio_memory ) ) );\n    addSayMessageParser( SayMessageParser::Ptr( new RecoveryMessageParser( audio_memory ) ) );\n\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 9 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 8 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 7 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 6 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 5 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 4 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 3 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 2 >( audio_memory ) ) );\n    // addSayMessageParser( SayMessageParser::Ptr( new FreeMessageParser< 1 >( audio_memory ) ) );\n\n    //\n    // set freeform message parser\n    //\n    setFreeformParser( FreeformParser::Ptr( new FreeformParser( M_worldmodel ) ) );\n\n    //\n    // set action generators\n    //\n    // M_action_generators.push_back( ActionGenerator::Ptr( new PassGenerator() ) );\n\n    //\n    // set communication planner\n    //\n    M_communication = Communication::Ptr( new SampleCommunication() );\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nSamplePlayer::~SamplePlayer()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nbool\nSamplePlayer::initImpl( CmdLineParser & cmd_parser )\n{\n    bool result = PlayerAgent::initImpl( cmd_parser );\n\n    // read additional options\n    result &= Strategy::instance().init( cmd_parser );\n\n    rcsc::ParamMap my_params( \"Additional options\" );\n#if 0\n    std::string param_file_path = \"params\";\n    param_map.add()\n        ( \"param-file\", \"\", &param_file_path, \"specified parameter file\" );\n#endif\n\n    cmd_parser.parse( my_params );\n\n    if ( cmd_parser.count( \"help\" ) > 0 )\n    {\n        my_params.printHelp( std::cout );\n        return false;\n    }\n\n    if ( cmd_parser.failed() )\n    {\n        std::cerr << \"player: ***WARNING*** detected unsuppprted options: \";\n        cmd_parser.print( std::cerr );\n        std::cerr << std::endl;\n    }\n\n    if ( ! result )\n    {\n        return false;\n    }\n\n    if ( ! Strategy::instance().read( config().configDir() ) )\n    {\n        std::cerr << \"***ERROR*** Failed to read team strategy.\" << std::endl;\n        return false;\n    }\n\n    if ( KickTable::instance().read( config().configDir() + \"/kick-table\" ) )\n    {\n        std::cerr << \"Loaded the kick table: [\"\n                  << config().configDir() << \"/kick-table]\"\n                  << std::endl;\n    }\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n  main decision\n  virtual method in super class\n*/\nvoid\nSamplePlayer::actionImpl()\n{\n    //\n    // update strategy and analyzer\n    //\n    Strategy::instance().update( world() );\n    FieldAnalyzer::instance().update( world() );\n\n    //\n    // prepare action chain\n    //\n    M_field_evaluator = createFieldEvaluator();\n    M_action_generator = createActionGenerator();\n\n    ActionChainHolder::instance().setFieldEvaluator( M_field_evaluator );\n    ActionChainHolder::instance().setActionGenerator( M_action_generator );\n\n    //\n    // special situations (tackle, objects accuracy, intention...)\n    //\n    const WorldModel & wm = this->world();\n\n    if ( doPreprocess() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": preprocess done\" );\n        return;\n    }\n\n    //\n    // update action chain\n    //\n    ActionChainHolder::instance().update( world() );\n\n    //\n    // create current role\n    //\n    std::string role_name;\n    SoccerRole::Ptr role_ptr;\n    {\n        role_ptr = Strategy::i().createRole( world().self().unum(), world() );\n        role_name = Strategy::i().getRoleName( world().self().unum(), world() );\n\n        if ( ! role_ptr )\n        {\n            std::cerr << config().teamName() << \": \"\n                      << world().self().unum()\n                      << \" Error. Role is not registerd.\\nExit ...\"\n                      << std::endl;\n            M_client->setServerAlive( false );\n            return;\n        }\n    }\n\n    //\n    // override execute if role accept\n    //\n    if ( role_ptr->acceptExecution( world() ) )\n    {\n        if(role_name==\"Sample\"){\n            executeSampleRole(this);\n            return;\n        }\n        role_ptr->execute( this );\n        return;\n    } \n\n    //\n    // play_on mode\n    //\n    if ( world().gameMode().type() == GameMode::PlayOn )\n    {\n        if(role_name==\"Sample\"){\n            executeSampleRole(this);\n            return;\n        }\n        role_ptr->execute( this );\n        return;\n    }\n\n    if ( world().gameMode().type() == GameMode::KickOff_)\n    {   \n        mpIntransit = false;\n        if(wm.self().unum()==10){\n            mpIntransit = true;\n            mpTarget = wm.ball().pos();\n        }\n        bool kickable = this->world().self().isKickable();\n        if ( this->world().existKickableTeammate()\n             && this->world().teammatesFromBall().front()->distFromBall()\n             < this->world().ball().distFromSelf() )\n        {\n            kickable = false;\n        }\n\n      // takePass(this,wm.self().unum(),1);//world().teammatesFromSelf().front()->unum());\n           makeDribble(this,Vector2D(-10,0),world().self().unum(),1);\n        if ( kickable )\n        {\n        //      giveThrough(this,wm.self().unum(),10);\n	       \n            //Bhv_BasicMove().execute(this);\n          //  Bhv_BasicOffensiveKick().execute(this);\n        //    if(!PassToBestPlayer( this )){\n        //        Body_HoldBall().execute( this );\n            //    doKick( this);\n                //Bhv_BasicOffensiveKick().execute(this);\n               // PassToBestPlayer(this);   \n            //f}                \n        }\n        else\n        {\n            Bhv_BasicMove().execute(this);\n        }\n        return;\n    }\n\n    //\n    // penalty kick mode\n    //\n    if ( world().gameMode().isPenaltyKickMode() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": penalty kick\" );\n        Bhv_PenaltyKick().execute( this );\n        return;\n    }\n\n    //\n    // other set play mode\n    //\n\n    if(role_name==\"Sample\"){\n        executeSampleRole(this);\n        return;\n    }\n}\n\n\n\n/*--------------------------------------------------------------------------*/\n\nbool\nSamplePlayer::SampleDribble( PlayerAgent * agent )\n{\n    const WorldModel & wm = agent->world();\n\n    const PlayerPtrCont & opps = wm.opponentsFromSelf();\n    const PlayerObject * nearest_opp\n        = ( opps.empty()\n            ? static_cast< PlayerObject * >( 0 )\n            : opps.front() );\n    const double nearest_opp_dist = ( nearest_opp\n                                      ? nearest_opp->distFromSelf()\n                                      : 1000.0 );\n    const Vector2D nearest_opp_pos = ( nearest_opp\n                                       ? nearest_opp->pos()\n                                       : Vector2D( -1000.0, 0.0 ) );\n\n    Vector2D pass_point;\n\n    if ( Body_Pass::get_best_pass( wm, &pass_point, NULL, NULL ) )\n    {\n        if ( pass_point.x > wm.self().pos().x - 1.0 )\n        {\n            bool safety = true;\n            const PlayerPtrCont::const_iterator opps_end = opps.end();\n            for ( PlayerPtrCont::const_iterator it = opps.begin();\n                  it != opps_end;\n                  ++it )\n            {\n                if ( (*it)->pos().dist( pass_point ) < 4.0 )\n                {\n                    safety = false;\n                }\n            }\n\n            if ( safety )\n            {\n                Body_Pass().execute( agent );\n                agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n                return true;\n            }\n        }\n    }\n\n    if ( nearest_opp_dist < 3.0 )\n    {\n        if ( Body_Pass().execute( agent ) )\n        {\n            agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n            return true;\n        }\n    }\n\n    // dribble to my body dir\n    if ( nearest_opp_dist < 5.0\n         && nearest_opp_dist > ( ServerParam::i().tackleDist()\n                                 + ServerParam::i().defaultPlayerSpeedMax() * 1.5 )\n         && wm.self().body().abs() < 70.0 )\n    {\n        const Vector2D body_dir_drib_target\n            = wm.self().pos()\n            + Vector2D::polar2vector(5.0, wm.self().body());\n\n        int max_dir_count = 0;\n        wm.dirRangeCount( wm.self().body(), 20.0, &max_dir_count, NULL, NULL );\n\n        if ( body_dir_drib_target.x < ServerParam::i().pitchHalfLength() - 1.0\n             && body_dir_drib_target.absY() < ServerParam::i().pitchHalfWidth() - 1.0\n             && max_dir_count < 3\n             )\n        {\n            // check opponents\n            // 10m, +-30 degree\n            const Sector2D sector( wm.self().pos(),\n                                   0.5, 10.0,\n                                   wm.self().body() - 30.0,\n                                   wm.self().body() + 30.0 );\n            // opponent check with goalie\n            if ( ! wm.existOpponentIn( sector, 10, true ) )\n            {\n                Body_Dribble( body_dir_drib_target,\n                              1.0,\n                              ServerParam::i().maxDashPower(),\n                              2\n                              ).execute( agent );\n                agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n                return true;\n            }\n        }\n    }\n\n    Vector2D drib_target( 50.0, wm.self().pos().absY() );\n    if ( drib_target.y < 20.0 ) drib_target.y = 20.0;\n    if ( drib_target.y > 29.0 ) drib_target.y = 27.0;\n    if ( wm.self().pos().y < 0.0 ) drib_target.y *= -1.0;\n    const AngleDeg drib_angle = ( drib_target - wm.self().pos() ).th();\n\n    // opponent is behind of me\n    if ( nearest_opp_pos.x < wm.self().pos().x + 1.0 )\n    {\n        // check opponents\n        // 15m, +-30 degree\n        const Sector2D sector( wm.self().pos(),\n                               0.5, 15.0,\n                               drib_angle - 30.0,\n                               drib_angle + 30.0 );\n        // opponent check with goalie\n        if ( ! wm.existOpponentIn( sector, 10, true ) )\n        {\n            const int max_dash_step\n                = wm.self().playerType()\n                .cyclesToReachDistance( wm.self().pos().dist( drib_target ) );\n            if ( wm.self().pos().x > 35.0 )\n            {\n                drib_target.y *= ( 10.0 / drib_target.absY() );\n            }\n            Body_Dribble( drib_target,\n                          1.0,\n                          ServerParam::i().maxDashPower(),\n                          std::min( 5, max_dash_step )\n                          ).execute( agent );\n        }\n        else\n        {\n            Body_Dribble( drib_target,\n                          1.0,\n                          ServerParam::i().maxDashPower(),\n                          2\n                          ).execute( agent );\n\n        }\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    // opp is far from me\n    if ( nearest_opp_dist > 2.5 )\n    {\n        Body_Dribble( drib_target,\n                      1.0,\n                      ServerParam::i().maxDashPower(),\n                      1\n                      ).execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    // opp is near\n\n    if ( Body_Pass().execute( agent ) )\n    {\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n\n    // opp is far from me\n    if ( nearest_opp_dist > 3.0 )\n    {\n        Body_Dribble( drib_target,\n                      1.0,\n                      ServerParam::i().maxDashPower(),\n                      1\n                      ).execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n\n    \n    if ( nearest_opp_dist > 2.5 )\n    {\n        Body_HoldBall().execute( agent );\n        agent->setNeckAction( new Neck_TurnToLowConfTeammate() );\n        return true;\n    }\n    \n\n    {\n        Body_AdvanceBall().execute( agent );\n        agent->setNeckAction( new Neck_ScanField() );\n    }\n\n    return true;\n}\n\n/*bool \nSamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){\n    const WorldModel & wm = agent->world();\n\n    Vector2D myPosition = wm.self().pos();\n    Vector2D currentHole = RoundToNearestHole(myPosition);\n    Vector2D frontup = Vector2D(currentHole.x+10, currentHole.y-10);\n    Vector2D backup = Vector2D(currentHole.x-10, currentHole.y-10);\n    Vector2D frontdown = Vector2D(currentHole.x+10, currentHole.y+10);\n    Vector2D backdown = Vector2D(currentHole.x-10, currentHole.y+10);\n\n    Vector2D fronthor = Vector2D(currentHole.x+20, currentHole.y);\n    Vector2D backhor = Vector2D(currentHole.x-20, currentHole.y);\n    Vector2D upvert = Vector2D(currentHole.x, currentHole.y-20);\n    Vector2D downvert = Vector2D(currentHole.x, currentHole.y+20);\n    \n    double buffer = 2.5;\n    \n    //TODO: Return true only if pass is advantageous\n    \n    if( IsOccupiedForPassing(agent, frontup, buffer)||\n        IsOccupiedForPassing(agent, frontdown, buffer)||\n        IsOccupiedForPassing(agent, backup, buffer)||\n        IsOccupiedForPassing(agent, backdown, buffer)||\n        IsOccupiedForPassing(agent, fronthor, buffer)||\n        IsOccupiedForPassing(agent, upvert, buffer)||\n        IsOccupiedForPassing(agent, downvert, buffer)||\n        IsOccupiedForPassing(agent, backhor, buffer)\n        ){\n        return true;\n    }\n\n    /*\n    const WorldModel & world = agent->world();\n    const PlayerPtrCont::const_iterator \n    t_end = world.teammatesFromSelf().end();\n    for ( PlayerPtrCont::const_iterator\n              it = world.teammatesFromSelf().begin();\n          it != t_end;\n          ++it )\n    {\n        if(((*it)->pos().dist(world.ball().pos()))<=20.0){\n            return false;\n        }  \n    }\n    \n    \n    return false;   \n}\n*/\n\nbool\nSamplePlayer::IsSectorEmpty(PlayerAgent * agent, Vector2D target, double buf_degree){\n    Neck_TurnToPoint( target ).execute(agent );\n    const WorldModel & wm = agent->world();\n    AngleDeg target_angle = (target - wm.self().pos()).dir();\n    double target_dis = wm.self().pos().dist(target);\n    const Sector2D sector( wm.self().pos(),\n                            0.5, target_dis + 4,\n                            target_angle - buf_degree,\n                            target_angle + buf_degree );\n    // opponent check without goalie\n    if ( ! wm.existOpponentIn( sector, 10, false ) )\n    {\n        return true;\n    }\n\n    return false;\n}\n\n\n\nint\nSamplePlayer::ClosestPlayerToBall(PlayerAgent * agent){\n    double mindis = 999;\n    int mindisunum = -1;\n    for(int i=2; i<=11; i++){\n        if(agent->world().ourPlayer(i)!=NULL){\n            if(agent->world().ourPlayer(i)->distFromBall() < mindis){\n                mindis = agent->world().ourPlayer(i)->distFromBall();\n                mindisunum = i;\n            }\n        }\n    }\n    return mindisunum;\n}\n\n\n//main function that will be used.\n\nbool\nSamplePlayer::executeSampleRole( PlayerAgent * agent )\n{   \n    if(agent->config().teamName()==\"opp\"){\n        Body_GoToPoint( Vector2D(-50,0), 0.0, ServerParam::i().maxDashPower(), -1, 4, true, 60).execute( agent );\n        return true;\n    }\n\n    //Setting up of different flags.\n\n    bool kickable = agent->world().self().isKickable();\n    \n    // If there is a teammate who can kick the ball and who is closer to the ball than I am.\n    if ( agent->world().existKickableTeammate()\n         && agent->world().teammatesFromBall().front()->distFromBall()\n         < agent->world().ball().distFromSelf() )\n    {\n        kickable = false;\n    }\n\n\n    if(agent->world().existKickableTeammate()){\n        //passHeard = false;\n        Opponenthasball = false;\n    }\n    else{};\n        //Opponenthasball = true;\n    \n\n    if(agent->world().existKickableOpponent()){\n        Opponenthasball = true;\n    }\n\n    //----------XX------------//\n    //If you have taken attack, you will have comment out the attach functions are replace\n    //them with your own, similarly if you have taken defense, you need to comment out the existing\n    //defence function and replace it with your own.\n    //------------xx------------//\n      \n   //  takePass(this,passer,(passer==11)?2:passer+1);\n    \n    // I have the ball, what to do?\n  //   const PlayerPtrCont & team = wm.teammatesFromSelf();\n //    const PlayerObject * nearest_team=team.front();\n\n    //makeDribble(this,Vector2D(-10,0),8,0.5);\n    setNeckAction( new Neck_TurnToBall() );\n    Bhv_BodyNeckToBall().execute(this);\n    if(!agent->world().audioMemory().pass().empty() )\n \n    {  \n      cout<<\"Pass Count: For\"<<world().self().unum()<<\" is \"<<agent->world().audioMemory().pass().size()<<\"  $\"<<endl;\n\n    }\n        makeDribble(this,Vector2D(-10,0),world().self().unum(),1);\n    if ( kickable && !Opponenthasball)\n    {\n     //    doKick( this);\n      //  takePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);\n      //   giveThrough(this,world().self().unum(),10);\n\n        \n    }\n\n    //This is for off the ball movement which attacking, where to go for passes etc.\n    else if (!kickable && !Opponenthasball)\n    {   \n        \n         \n          //   doMove(this);\n\n        \n       //   runThrough(this);\n        }\n\n    //ATTACK ENDS HERE\n    //--------XX----------XX--------//\n    // DEFENCE STARTS HERE\n    //The defense call\n    else\n    {\n        //Uncomment this for defense.\n        //If I can kick the ball, but opponent has it. Common ball.\n        if (kickable && Opponenthasball){\n            if ( Bhv_ChainAction().execute( agent ) )\n            {\n                dlog.addText( Logger::TEAM,\n                      __FILE__\": (execute) do chain action\" );\n            agent->debugClient().addMessage( \"ChainAction\" );\n            return true;\n            }\n		          \n            Bhv_BasicOffensiveKick().execute( agent );\n            return true;\n\n            }\n\n        // I don't have the ball, opponent has it, off the ball movement while defending.\n        //falling back etc.     \n        else if (!kickable && Opponenthasball){\n            Bhv_BasicMove().execute(agent);\n        }\n        return true;\n    };\n\n    //DEFENSE ENDS HERE.\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nvoid\nSamplePlayer::doKick( PlayerAgent * agent )\n{\n    \n    if ( Bhv_ChainAction().execute( agent ) )\n    {\n        return;\n    }\n\n    Bhv_BasicOffensiveKick().execute( agent );\n}\n\n\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nvoid\nSamplePlayer::doMove( PlayerAgent * agent )\n{\n        Bhv_BasicMove().execute(agent);\n        return;\n}\n\nbool\nSamplePlayer::BasicMove(PlayerAgent * agent){\n    const WorldModel & wm = agent->world();\n    \n    //-----------------------------------------------\n    // tackle\n    \n    if ( Bhv_BasicTackle( 0.8, 80.0 ).execute( agent ) )\n    {   \n        return true;\n    }\n\n    /*--------------------------------------------------------*/\n    // chase ball\n    const int self_min = wm.interceptTable()->selfReachCycle();\n    const int mate_min = wm.interceptTable()->teammateReachCycle();\n    const int opp_min = wm.interceptTable()->opponentReachCycle();\n\n    //Intercept\n    if ( ! wm.existKickableTeammate()\n         && ( self_min <= 3\n              || ( self_min <= mate_min\n                   && self_min < opp_min + 3 )\n              )\n         )\n    {\n        std::cout<<\"body intercept called for player - \"<<wm.self().unum()<<std::endl;\n\n    \n        dlog.addText( Logger::TEAM,\n                      __FILE__\": intercept\");\n        Body_Intercept().execute( agent );\n        agent->setNeckAction( new Neck_OffensiveInterceptNeck() );\n        return true;\n    }\n    \n    //Check if ball has been passed\n    /*\n    if(wm.existKickableTeammate()){\n        int CurrentBH = GetBHUnum(agent);\n        if(CurrentBH!=LastBH && CurrentBH!=-1){\n            FoundNewBH = true;\n            LastBH = CurrentBH;\n        }\n        else\n            FoundNewBH = false;\n\n        //Opponenthasball=false;\n    }\n    */\n    \n    const Vector2D target_point = Vector2D(0,0);\n    const double dash_power = ServerParam::i().maxDashPower();\n\n    double dist_thr = wm.ball().distFromSelf() * 0.1;\n    if ( dist_thr < 1.0 ) dist_thr = 1.0;\n\n    \n\n    if ( wm.existKickableOpponent()\n         && wm.ball().distFromSelf() < 18.0 )\n    {\n        agent->setNeckAction( new Neck_TurnToBall() );\n        return true;\n    }\n    else\n    {\n        agent->setNeckAction( new Neck_TurnToBallOrScan() );\n    }\n\n    return true;\n}\n\n\n\n\n\n\n//centreback\n\n\n\n\n\n\n\nbool\nSamplePlayer::isKickable(PlayerAgent * agent, int unum){\n    const WorldModel & wm = agent->world();\n    if(wm.ourPlayer(unum)!=NULL){\n        if(wm.ourPlayer(unum)->distFromBall() < ServerParam::i().defaultKickableArea()){\n            return true;\n        }\n        return false;\n    }\n    else{\n        return false;\n    }\n}\n\nbool \nSamplePlayer::AreSamePoints(Vector2D A, Vector2D B, double buffer){\n    //Check if and b are the same points +/- buffer\n    if(A.dist(B)<buffer)\n        return true;\n    return false;\n}\n\ndouble \nSamplePlayer::abs(double d){\n    if (d>0.00)\n        return d;\n    else\n        return d*(-1.00);\n}\n\n\nbool\nSamplePlayer::AreSameNos(double A, double B, double buffer){\n    if( abs(A-B) < buffer)\n        return true;\n    return false;\n}\n\n\n\ndouble DistanceBetweenPoints(double x1,double y1,double x2,double y2){\n \n        double distance = sqrt(pow((x1-x2),2)+pow((y1-y2),2));\n\n        return distance;\n    }\n\n\n\n    double AngleBetweenPoints(double x1,double y1,double x2,double y2,double x3,double y3){\n\n        double angle = acos((pow(DistanceBetweenPoints(x1,y1,x2,y2),2)+pow(DistanceBetweenPoints(x1,y1,x3,y3),2)-pow(DistanceBetweenPoints(x2,y2,x3,y3),2))/(2*DistanceBetweenPoints(x1,y1,x2,y2)*DistanceBetweenPoints(x1,y1,x3,y3)));\n        \n        return angle;\n    }\n\n    static bool compare_first(const std::pair<double,double>& i, const std::pair<double,double>& j)\n    {\n        return i.first > j.first;\n    }\n\n\n    static bool compare_second(const std::pair<double,double>& i, const std::pair<double,double>& j)\n    {\n        return i.second > j.second;\n    }\n\n    double slope(double x1,double y1,double x2,double y2){\n\n        double slope_of_line = (y2-y1)/(x2-x1);\n\n        return slope_of_line;\n    }\n\n    double constant(double x1,double y1,double slope_of_line){\n\n        return (y1-slope_of_line*x1);\n    }\n\n    double bisector_line_const(double c1,double c2,double a1,double a2){\n\n\n        return ((c2-c1)*sqrt((pow(a2,2)+1)*(pow(a1,2)+1)));\n    }\n\n    double bisector_line_x_const(double a1,double a2){\n\n        return ((a2*sqrt(pow(a1,2)+1))-(a1*sqrt(pow(a2,2)+1)));\n    }\n\n    double bisector_line_y_const(double a1,double a2){\n\n\n        return (sqrt(pow(a2,2)+1)-sqrt(pow(a1,2)+1));\n    }\n\n    double intersecting_point_x(double c1, double c2, double a, double b){\n\n        double x = ((c2*b - c1*a)/((a*a)+(b*b)));\n        \n        return x;\n    }\n\n\n\n    double intersecting_point_y(double c1, double c2, double a, double b){\n\n        double y = ((c2*a + c1*b)/((a*a)+(b*b)));\n        \n        return y;\n    } \n\n    double angle_between_two_lines(const Line2D & line1,const Line2D & line2 ){\n\n        double theta_1 = atan(line1.getB()/line1.getA()); \n    \n        double theta_2 = atan(line2.getB()/line2.getA());\n\n        return (theta_2-theta_1);\n    }\n\n\n    static\n    Line2D angle_bisectorof( const Vector2D & origin,\n                           const AngleDeg & left,\n                           const AngleDeg & right )\n      {\n          return Line2D( origin, AngleDeg::bisect( left, right ) );\n      }\n\n\n\n\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleActionStart()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleActionEnd()\n{\n    if ( world().self().posValid() )\n    {\n#if 0\n        const ServerParam & SP = ServerParam::i();\n        //\n        // inside of pitch\n        //\n\n        // top,lower\n        debugClient().addLine( Vector2D( world().ourOffenseLineX(),\n                                         -SP.pitchHalfWidth() ),\n                               Vector2D( world().ourOffenseLineX(),f\n                                         -SP.pitchHalfWidth() - 3.0 ),\n                               Vector2D( world().ourOffensePlayerLineX(),\n                                         -SP.pitchHalfWidth() ) );\n        // top,upper\n        debugClient().addLine( Vector2D( world().ourDefensePlayerLineX(),\n                                         -SP.pitchHalfWidth() - 3.0 ),\n                               Vector2D( world().ourDefensePlayerLineX(),\n                                         -SP.pitchHalfWidth() ) );\n        // bottom,lower\n        debugClient().addLine( Vector2D( world(Opponenthasball\nO).theirOffensePlayerLineX(),\n                                         +SP.pitchHalfWidth() ),\n                               Vector2D( world().theirOffensePlayerLineX(),\n                                         +SP.pitchHalfWidth() + 3.0 ) );\n        // bottom,lower\n        debugClient().addLine( Vector2D( world().theirDefensePlayerLineX(),\n                                         +SP.pitchHalfWidth() ),\n                               Vector2D( world().theirDefensePlayerLineX(),\n                                         +SP.pitchHalfWidth() + 3.0 ) );\n#else\n        // top,lower\n        debugClient().addLine( Vector2D( world().ourDefenseLineX(),\n                                         world().self().pos().y - 2.0 ),\n                               Vector2D( world().ourDefenseLineX(),\n                                         world().self().pos().y + 2.0 ) );\n\n        //\n        debugClient().addLine( Vector2D( world().offsideLineX(),\n                                         world().self().pos().y - 15.0 ),\n                               Vector2D( world().offsideLineX(),\n                                         world().self().pos().y + 15.0 ) );\n#endif\n    }\n\n    //\n    // ball position & velocity\n    //\n    dlog.addText( Logger::WORLD,\n                  \"WM: BALL pos=(%lf, %lf), vel=(%lf, %lf, r=%lf, ang=%lf)\",\n                  world().ball().pos().x,\n                  world().ball().pos().y,\n                  world().ball().vel().x,\n                  world().ball().vel().y,\n                  world().ball().vel().r(),\n                  world().ball().vel().th().degree() );\n\n\n    dlog.addText( Logger::WORLD,\n                  \"WM: SELF move=(%lf, %lf, r=%lf, th=%lf)\",\n                  world().self().lastMove().x,\n                  world().self().lastMove().y,\n                  world().self().lastMove().r(),\n                  world().self().lastMove().th().degree() );\n\n    Vector2D diff = world().ball().rpos() - world().ball().rposPrev();\n    dlog.addText( Logger::WORLD,\n                  \"WM: BALL rpos=(%lf %lf) prev_rpos=(%lf %lf) diff=(%lf %lf)\",\n                  world().ball().rpos().x,\n                  world().ball().rpos().y,\n                  world().ball().rposPrev().x,\n                  world().ball().rposPrev().y,\n                  diff.x,\n                  diff.y );\n\n    Vector2D ball_move = diff + world().self().lastMove();\n    Vector2D diff_vel = ball_move * ServerParam::i().ballDecay();\n    dlog.addText( Logger::WORLD,\n                  \"---> ball_move=(%lf %lf) vel=(%lf, %lf, r=%lf, th=%lf)\",\n                  ball_move.x,\n                  ball_move.y,\n                  diff_vel.x,\n                  diff_vel.y,\n                  diff_vel.r(),\n                  diff_vel.th().degree() );\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handleServerParam()\n{\n    if ( KickTable::instance().createTables() )\n    {\n        std::cerr << world().teamName() << ' '\n                  << world().self().unum() << \": \"\n                  << \" KickTable created.\"\n                  << std::endl;\n    }\n    else\n    {\n        std::cerr << world().teamName() << ' '\n                  << world().self().unum() << \": \"\n                  << \" KickTable failed...\"\n                  << std::endl;\n        M_client->setServerAlive( false );\n    }\n\n\n    if ( ServerParam::i().keepawayMode() )\n    {\n        std::cerr << \"set Keepaway mode communication.\" << std::endl;\n        M_communication = Communication::Ptr( new KeepawayCommunication() );\n    }\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handlePlayerParam()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n */\nvoid\nSamplePlayer::handlePlayerType()\n{\n\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n  communication decision.\n  virtual method in super class\n*/\nvoid\nSamplePlayer::communicationImpl()\n{\n    if ( M_communication )\n    {\n        M_communication->execute( this );\n    }\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n*/\nbool\nSamplePlayer::doPreprocess()\n{\n    // check tackle expires\n    // check self position accuracy\n    // ball search\n    // check queued intention\n    // check simultaneous kick\n	\n    const WorldModel & wm = this->world();\n\n    dlog.addText( Logger::TEAM,\n                  __FILE__\": (doPreProcess)\" );\n\n    //\n    // freezed by tackle effect\n    //\n        if ( wm.self().isFrozen() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": tackle wait. expires= %d\",\n                      wm.self().tackleExpires() );\n        // face neck to ball\n        this->setViewAction( new View_Tactical() );\n        this->setNeckAction( new Neck_TurnToBallOrScan() );\n        return true;\n    }\n    \n\n    //\n    // BeforeKickOff or AfterGoal. jump to the initial position\n    //\n    if ( wm.gameMode().type() == GameMode::BeforeKickOff\n         || wm.gameMode().type() == GameMode::AfterGoal_ )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": before_kick_off\" );\n        Vector2D move_point =  Strategy::i().getPosition( wm.self().unum() );\n        Bhv_CustomBeforeKickOff( move_point ).execute( this );\n        this->setViewAction( new View_Tactical() );\n        return true;\n    }\n\n    //\n    // self localization error\n    //\n    \n    if ( ! wm.self().posValid() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": invalid my pos\" );\n        Bhv_Emergency().execute( this ); // includes change view\n        return true;\n    }\n    \n\n    //\n    // ball localization error\n    //\n    \n    const int count_thr = ( wm.self().goalie()\n                            ? 10\n                            : 5 );\n    if ( wm.ball().posCount() > count_thr\n         || ( wm.gameMode().type() != GameMode::PlayOn\n              && wm.ball().seenPosCount() > count_thr + 10 ) )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": search ball\" );\n        this->setViewAction( new View_Tactical() );\n        Bhv_NeckBodyToBall().execute( this );\n        return true;\n    }\n    \n\n    //\n    // set default change view\n    //\n\n    this->setViewAction( new View_Tactical() );\n\n    //\n    // check shoot chance\n    //\n    \n    if ( doShoot() )\n    {\n        std::cout<<\"doShoot\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n\n        return true;\n    }\n    \n\n    //\n    // check queued action\n    //\n    \n    if ( this->doIntention() )\n    {   \n        std::cout<<\"doIntention------------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": do queued intention\" );\n        return true;\n    }\n\n    //\n    // check simultaneous kick\n    //\n    \n    if ( doForceKick() )\n    {   \n        std::cout<<\"doForceKick--------------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        return true;\n    }\n    \n\n    //\n    // check pass message\n    //\n    \n    if ( doHeardPassReceive() )\n    {\n        std::cout<<\"doHeardPassReceive------------------------------------------------------\"<<std::endl;\n        std::cout<<\"*******************************************************************************\"<<std::endl;\n        return true;\n    }\n    \n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doShoot()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.gameMode().type() != GameMode::IndFreeKick_\n         && wm.time().stopped() == 0\n         && wm.self().isKickable()\n         && Bhv_StrictCheckShoot().execute( this ) )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": shooted\" );\n\n        // reset intention\n        this->setIntention( static_cast< SoccerIntention * >( 0 ) );\n        return true;\n    }\n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doForceKick()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.gameMode().type() == GameMode::PlayOn\n         && ! wm.self().goalie()\n         && wm.self().isKickable()\n         && wm.existKickableOpponent() )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": simultaneous kick\" );\n        this->debugClient().addMessage( \"SimultaneousKick\" );\n        Vector2D goal_pos( ServerParam::i().pitchHalfLength(), 0.0 );\n\n        if ( wm.self().pos().x > 36.0\n             && wm.self().pos().absY() > 10.0 )\n        {\n            goal_pos.x = 45.0;\n            dlog.addText( Logger::TEAM,\n                          __FILE__\": simultaneous kick cross type\" );\n        }\n        Body_KickOneStep( goal_pos,\n                          ServerParam::i().ballSpeedMax()\n                          ).execute( this );\n        this->setNeckAction( new Neck_ScanField() );\n        return true;\n    }\n\n    return false;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nbool\nSamplePlayer::doHeardPassReceive()\n{\n    const WorldModel & wm = this->world();\n\n    if ( wm.audioMemory().passTime() != wm.time()\n         || wm.audioMemory().pass().empty()\n         || wm.audioMemory().pass().front().receiver_ != wm.self().unum() )\n    {\n        return false;\n    }\n\n    //passHeard = true;\n\n    //Vector2D closestOppPos = wm.getOpponentNearestToSelf(5, false)->pos();\n\n    //closestOppDis = static_cast<int>(wm.self().pos().dist(closestOppPos));\n\n\n    int self_min = wm.interceptTable()->selfReachCycle();\n    Vector2D intercept_pos = wm.ball().inertiaPoint( self_min );\n    Vector2D heard_pos = wm.audioMemory().pass().front().receive_pos_;\n\n    dlog.addText( Logger::TEAM,\n                  __FILE__\":  (doHeardPassReceive) heard_pos(%.2f %.2f) intercept_pos(%.2f %.2f)\",\n                  heard_pos.x, heard_pos.y,\n                  intercept_pos.x, intercept_pos.y );\n\n    if ( ! wm.existKickableTeammate()\n         && wm.ball().posCount() <= 1\n         && wm.ball().velCount() <= 1\n         && self_min < 20\n         //&& intercept_pos.dist( heard_pos ) < 3.0 ) //5.0 )\n         )\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": (doHeardPassReceive) intercept cycle=%d. intercept\",\n                      self_min );\n        this->debugClient().addMessage( \"Comm:Receive:Intercept\" );\n        Body_Intercept().execute( this );\n        this->setNeckAction( new Neck_TurnToBall() );\n    }\n    else\n    {\n        dlog.addText( Logger::TEAM,\n                      __FILE__\": (doHeardPassReceive) intercept cycle=%d. go to receive point\",\n                      self_min );\n        this->debugClient().setTarget( heard_pos );\n        this->debugClient().addMessage( \"Comm:Receive:GoTo\" );\n        Body_GoToPoint( heard_pos,\n                    0.5,\n                        ServerParam::i().maxDashPower()\n                        ).execute( this );\n        this->setNeckAction( new Neck_TurnToBall() );\n    }\n\n    this->setIntention( new IntentionReceive( heard_pos,\n                                              ServerParam::i().maxDashPower(),\n                                              0.9,\n                                              5,\n                                              wm.time() ) );\n\n    return true;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nFieldEvaluator::ConstPtr\nSamplePlayer::getFieldEvaluator() const\n{\n    return M_field_evaluator;\n}\n\n/*-------------------------------------------------------------------*/\n/*!\n\n*/\nFieldEvaluator::ConstPtr\nSamplePlayer::createFieldEvaluator() const\n{\n    return FieldEvaluator::ConstPtr( new SampleFieldEvaluator );\n}\n\n\n/*-------------------------------------------------------------------*/\n/*!\n*/\n#include \"actgen_cross.h\"\n#include \"actgen_direct_pass.h\"\n#include \"actgen_self_pass.h\"\n#include \"actgen_strict_check_pass.h\"\n#include \"actgen_short_dribble.h\"\n#include \"actgen_simple_dribble.h\"\n#include \"actgen_shoot.h\"\n#include \"actgen_action_chain_length_filter.h\"\n\nActionGenerator::ConstPtr\nSamplePlayer::createActionGenerator() const\n{\n    CompositeActionGenerator * g = new CompositeActionGenerator();\n\n    //\n    // shoot\n    //\n    g->addGenerator( new ActGen_RangeActionChainLengthFilter\n                     ( new ActGen_Shoot(),\n                       2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    //\n    // strict check pass\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_StrictCheckPass(), 1 ) );\n\n    //\n    // cross\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_Cross(), 1 ) );\n\n    //\n    // direct pass\n    //\n    // g->addGenerator( new ActGen_RangeActionChainLengthFilter\n    //                  ( new ActGen_DirectPass(),\n    //                    2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    //\n    // short dribble\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_ShortDribble(), 1 ) );\n\n    //\n    // self pass (long dribble)\n    //\n    g->addGenerator( new ActGen_MaxActionChainLengthFilter\n                     ( new ActGen_SelfPass(), 1 ) );\n\n    //\n    // simple dribble\n    //\n    // g->addGenerator( new ActGen_RangeActionChainLengthFilter\n    //                  ( new ActGen_SimpleDribble(),\n    //                    2, ActGen_RangeActionChainLengthFilter::MAX ) );\n\n    return ActionGenerator::ConstPtr( g );\n}\n\n",
+			"file": "sample_player.cpp",
+			"file_size": 49137,
+			"file_write_time": 130581346396677422,
+			"settings":
+			{
+				"buffer_size": 49138,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/usr/local/include/rcsc/player/say_message_builder.h",
+			"settings":
+			{
+				"buffer_size": 38641,
 				"line_ending": "Unix"
 			}
 		},
@@ -143,10 +155,10 @@
 			}
 		},
 		{
-			"file": "/usr/local/include/rcsc/player/free_message.h",
+			"file": "/usr/local/include/rcsc/game_time.h",
 			"settings":
 			{
-				"buffer_size": 3478,
+				"buffer_size": 6361,
 				"line_ending": "Unix"
 			}
 		},
@@ -191,8 +203,21 @@
 	],
 	"file_history":
 	[
-		"/usr/local/include/rcsc/common/audio_message.h",
+		"/usr/share/themes/QtCurve/gtk-2.0/gtkrc",
+		"/usr/local/include/rcsc/player/free_message.h",
+		"/usr/local/include/rcsc/player/abstract_player_object.h",
+		"/usr/local/include/rcsc/player/world_model.h",
+		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/sample_player.cpp",
+		"/usr/local/include/rcsc/common/say_message_parser.h",
 		"/usr/local/include/rcsc/player/say_message_builder.h",
+		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/chain_action/actgen_cross.cpp",
+		"/usr/local/include/rcsc/player/player_command.h",
+		"/usr/local/include/rcsc/player/debug_client.h",
+		"/usr/local/include/rcsc/action/body_hold_ball2008.h",
+		"/usr/local/include/rcsc/action/body_hold_ball.h",
+		"/usr/local/include/rcsc/action/arm_off.h",
+		"/usr/local/include/rcsc/common/basic_client.h",
+		"/usr/local/include/rcsc/common/audio_message.h",
 		"/usr/local/include/rcsc/action/body_go_to_point2010.h",
 		"/usr/local/include/rcsc/action/body_go_to_point.h",
 		"/usr/local/include/rcsc/action/bhv_shoot2008.h",
@@ -209,28 +234,21 @@
 		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/formations-dt/offense-formation.conf",
 		"/usr/local/include/rcsc/action/neck_turn_to_player_or_scan.h",
 		"/usr/local/include/rcsc/action/body_turn_to_point.h",
-		"/usr/local/include/rcsc/player/debug_client.h",
 		"/usr/local/include/rcsc/player/player_agent.h",
 		"/usr/local/include/rcsc/common/audio_memory.h",
 		"/usr/local/include/rcsc/common/soccer_agent.h",
-		"/usr/local/include/rcsc/common/basic_client.h",
 		"/usr/local/include/rcsc/monitor/monitor_command.h",
 		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/bhv_basic_move.cpp",
 		"/usr/local/include/rcsc/player/player_object.h",
-		"/usr/local/include/rcsc/common/say_message_parser.h",
-		"/usr/local/include/rcsc/player/free_message.h",
 		"/usr/local/include/rcsc/action/basic_actions.h",
 		"/usr/local/include/rcsc/common/periodic_callback.h",
 		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/start.sh",
 		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/start.sh.in",
-		"/usr/local/include/rcsc/player/abstract_player_object.h",
 		"/home/anuj/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
 		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/formations-dt/normal-formation.conf",
 		"/home/anuj/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
-		"/usr/local/include/rcsc/player/player_command.h",
 		"/usr/local/include/rcsc/common/free_message_parser.h",
 		"/home/anuj/Desktop/robocup-share/robocup-share/Robocop-Attack-Rowdy_Roosters/sample_player.cpp",
-		"/home/anuj/Desktop/robocup-share/robocup-share/attack/src/sample_player.cpp",
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/sample_player.cpp",
 		"/usr/local/include/rcsc/action/body_smart_kick.h",
 		"/usr/share/applications/sublime_text.desktop",
@@ -240,7 +258,6 @@
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/bhv_basic_tackle.cpp",
 		"/usr/local/include/rcsc/player/localization.h",
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/bhv_basic_move.cpp",
-		"/usr/local/include/rcsc/player/world_model.h",
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/chain_action/pass.cpp",
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/bhv_penalty_kick.cpp",
 		"/home/anuj/Desktop/robocup-share/robocup-share/agent2d-3.1.2/src/bhv_go_to_static_ball.cpp",
@@ -270,6 +287,122 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"kickof",
+			"kick",
+			"dokic",
+			"odkic",
+			"kickOff",
+			"give",
+			"addSa",
+			"().audioMemory().passTime()",
+			"run",
+			" const WorldModel & wm = this->world();\n\n    if ( wm.audioMemory().passTime() != wm.time()\n         || wm.audioMemory().pass().empty()\n         || wm.audioMemory().pass().front().receiver_ != wm.self().unum() )\n    {\n        return false;\n    }",
+			"doHe",
+			"runThrough",
+			"doHeard",
+			"ball",
+			"tro",
+			"doIntention",
+			"doIntention\n",
+			"doIm",
+			"count",
+			"gameTime",
+			"domove",
+			"cout<<",
+			"dokick",
+			"doHeardPassReceive",
+			"doINte",
+			"intent",
+			"runT",
+			"give",
+			"girve",
+			"give",
+			"doKic",
+			"doHe",
+			"runT",
+			"give",
+			"ball_P",
+			"ball_",
+			"doK",
+			"ball_pos",
+			"doKi",
+			"M_pass",
+			"doKi",
+			"runT",
+			"cout",
+			"doK",
+			"ball",
+			"Ball",
+			"ball(",
+			"ball",
+			"ball()",
+			"selfMe",
+			"angle",
+			"angg",
+			"ang",
+			"angleDeg",
+			"angle",
+			"addSa",
+			"tellMe",
+			"tellme",
+			"addSa",
+			"pass(",
+			"pass",
+			"give",
+			"Message",
+			"freeMe",
+			"free",
+			"passMess",
+			"pass",
+			"cout",
+			"count",
+			"pass(.",
+			"doIN",
+			"domo",
+			"hold",
+			"give",
+			"pass",
+			"passMess",
+			"runTr",
+			"domove",
+			"domoe",
+			"dokick",
+			"giveT",
+			"pass",
+			"give",
+			"docheck",
+			"doSay",
+			"update",
+			"updatee",
+			"front",
+			"receive",
+			"addSa",
+			"Clear",
+			"pass.fron",
+			"queuedNextSelfBody",
+			"thro",
+			"thr",
+			"tht",
+			"clear",
+			"doKeepBall",
+			"doKeepBall\n",
+			"intention",
+			"message",
+			"messge",
+			"cler",
+			"remove",
+			"receive",
+			"deb",
+			"connect",
+			"addCircle",
+			"debug",
+			"queued",
+			"self",
+			"ClearS",
+			"clearAll",
+			"effec",
+			"command",
+			"print",
 			"run",
 			"PassMessage",
 			"run",
@@ -281,123 +414,7 @@
 			"pass",
 			"time",
 			"GameTime\n",
-			"clear",
-			"pass().front",
-			"message",
-			"addSa",
-			"give",
-			"message",
-			"give",
-			"AbstractPlayerCont\n",
-			"AbstractPlayerObject",
-			"nearest",
-			"opp",
-			"getFirstPlayer\n",
-			"world",
-			"body_",
-			"body",
-			"kick",
-			"doShoot",
-			"get",
-			"take",
-			"BasicMove",
-			"formation",
-			"teammates",
-			"teamma",
-			"team",
-			"formation",
-			"goto",
-			"gotTo",
-			"gotTO",
-			"take",
-			"cout",
-			"count",
-			"kickOff",
-			"kickO",
-			"dokic",
-			"turn",
-			"trun",
-			"neck",
-			"rela",
-			"to_re",
-			"11",
-			"11\\",
-			"11",
-			"neck",
-			"kick",
-			"dokic",
-			"doKI",
-			"kick_step",
-			"takePas",
-			"take",
-			"audio",
-			"pass",
-			"pass()",
-			"pass",
-			"cout",
-			"takePass",
-			"kickoFF",
-			"s_get_ball_speed_for_pass",
-			"s_get_ball_speed_for_pass\n",
-			"takePass",
-			"kickC",
-			"kickCount",
-			"kick",
-			"vel",
-			"doKIc",
-			"anuj",
-			"anyj",
-			"got",
-			"pass",
-			"audio",
-			"doHer",
-			"doKic",
-			"take",
-			"kic",
-			"doMOve",
-			"pass().",
-			"takePass",
-			"doKick",
-			"doKic",
-			"pass()",
-			"doKIck",
-			"doHeardPassReceive",
-			"kicka",
-			"get",
-			"sayCommand",
-			"get",
-			"effe",
-			"debug_cl",
-			"passk",
-			"exe",
-			"doKic",
-			"addSayMessage",
-			"receiver",
-			"createPassCommon",
-			"server",
-			"pass",
-			"dosayPass",
-			"message",
-			"get",
-			"kic",
-			"PassToBestPlayer",
-			"mpIntransit",
-			"config_dir",
-			"before",
-			"get",
-			"state",
-			"seeSta",
-			"view",
-			"message",
-			"take",
-			"kickoff",
-			"comm",
-			"pass",
-			"commun",
-			"comm",
-			"current",
-			"Communication",
-			"KeepawayCommunication"
+			"clear"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -415,105 +432,11 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/usr/local/include/rcsc/player/world_model.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 48607,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1375,
-								1375
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 515.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "sample_player.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 48304,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6446,
-								6446
-							]
-						],
-						"settings":
-						{
-							"rulers":
-							[
-							],
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"word_wrap": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2722.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "chain_action/bhv_pass_kick_find_receiver.cpp",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 29622,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								29377,
-								29377
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 14134.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "/usr/local/include/rcsc/common/audio_memory.h",
 					"semi_transient": false,
 					"settings":
@@ -525,8 +448,8 @@
 						"selection":
 						[
 							[
-								1550,
-								1550
+								11207,
+								11207
 							]
 						],
 						"settings":
@@ -536,27 +459,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4576.0,
+						"translation.y": 6468.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "/usr/local/include/rcsc/common/say_message_parser.h",
+					"buffer": 1,
+					"file": "/usr/local/include/rcsc/player/world_model.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 32387,
+						"buffer_size": 48607,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1620,
-								1620
+								18126,
+								18126
 							]
 						],
 						"settings":
@@ -565,15 +488,75 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 682.0,
+						"translation.x": 0.0,
+						"translation.y": 20898.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 2,
+					"file": "sample_player.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 49138,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6607.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/usr/local/include/rcsc/player/say_message_builder.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 38641,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21868,
+								21868
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 13708.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
 					"file": "/usr/local/include/rcsc/player/action_effector.h",
 					"semi_transient": false,
 					"settings":
@@ -585,8 +568,8 @@
 						"selection":
 						[
 							[
-								5097,
-								5097
+								11864,
+								11864
 							]
 						],
 						"settings":
@@ -596,14 +579,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 626.0,
+						"translation.y": 5902.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "/usr/local/include/rcsc/player/player_agent.h",
 					"semi_transient": false,
 					"settings":
@@ -615,8 +598,8 @@
 						"selection":
 						[
 							[
-								8807,
-								8807
+								9220,
+								9220
 							]
 						],
 						"settings":
@@ -626,27 +609,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 713.0,
+						"translation.y": 481.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "/usr/local/include/rcsc/player/free_message.h",
+					"buffer": 6,
+					"file": "/usr/local/include/rcsc/game_time.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3478,
+						"buffer_size": 6361,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1560,
-								1560
+								1548,
+								1548
 							]
 						],
 						"settings":
@@ -655,15 +638,15 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 592.0,
+						"translation.x": 0.0,
+						"translation.y": 821.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 7,
 					"file": "/usr/local/include/rcsc/action/body_smart_kick.h",
 					"semi_transient": false,
 					"settings":
@@ -675,8 +658,8 @@
 						"selection":
 						[
 							[
-								1775,
-								1775
+								1516,
+								1516
 							]
 						],
 						"settings":
@@ -686,7 +669,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 825.0,
+						"translation.y": 810.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 7,

@@ -110,11 +110,13 @@ using namespace std;
 /*!
 
  */
+
+
 void takeShoot(PlayerAgent * agent)
 {
 
 }
-void takePass(PlayerAgent * agent ,int passTaker,int passReceiver )
+void givePass(PlayerAgent * agent ,int passTaker,int passReceiver )
 {
   const double dash_power = Strategy::get_normal_dash_power( agent->world() );
   const AbstractPlayerObject * receiver = agent->world().ourPlayer(passReceiver);
@@ -128,27 +130,18 @@ void takePass(PlayerAgent * agent ,int passTaker,int passReceiver )
         {
  
            double ballspeed=ServerParam::i().ballSpeedMax();
-            double distance=(double) receiver_pos.dist(agent->world().self().pos());
-        
-            cout<<"##########################"<<distance<<"##########################"<<endl;
-
-            Body_TurnToPoint( receiver_pos ).execute( agent );
-         //   if(distance>30)
-          //  Body_SmartKick( receiver_pos,ballspeed,ballspeed*0.96,3 ).execute( agent );
-          //   else
-            Body_KickOneStep( receiver_pos,ballspeed*(distance/30)).execute( agent);
-         //   Body_KickToRelative(distance,180,true).execute(agent);
-
-            Vector2D ball_vel( 0.0, 0.0 );
-            if ( ! agent->effector().queuedNextBallKickable() )
-            ball_vel = agent->effector().queuedNextBallVel();
-     
-            agent->addSayMessage( 
-                new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel) 
-                );     
-
-
-    
+           double distance=(double) receiver_pos.dist(agent->world().self().pos());
+           Body_TurnToPoint( receiver_pos ).execute( agent );
+           Body_KickOneStep( receiver_pos,ballspeed*(distance/30)).execute( agent);
+           Vector2D ball_vel( 0.0, 0.0 );
+           if ( ! agent->effector().queuedNextBallKickable() )
+           ball_vel = agent->effector().queuedNextBallVel();
+           ((SamplePlayer*)agent)->lastRole="Passer";
+           agent->addSayMessage(new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel));     
+           #ifdef MYDEBUG
+           cout<<"Distance :"<<distance<<endl;
+           cout<<PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;
+            #endif
         }
         }
 
@@ -160,6 +153,8 @@ void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
         const AbstractPlayerObject * dribbler = agent->world().ourPlayer(unum);
         const double dash_power = Strategy::get_normal_dash_power( agent->world() );
         if(!dribbler)return;
+
+
         if(agent->world().self().unum()==unum)
         {
         bool kickable = agent->world().self().isKickable();
@@ -191,12 +186,11 @@ void followDribbler(PlayerAgent * agent)
 void giveThrough(PlayerAgent * agent,int unum,double approxDist)
 {
     const WorldModel & wm = agent->world();
-      const PlayerObject * teammate=wm.getTeammateNearestToSelf(1);
+    const PlayerObject * teammate=wm.getTeammateNearestToSelf(1);
    if(!teammate)
        return;
-
-     if( wm.self().isKickable())
-        {
+    if( !wm.self().isKickable())
+    return;
       //   const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
        
          
@@ -211,34 +205,34 @@ void giveThrough(PlayerAgent * agent,int unum,double approxDist)
            ball_vel = agent->effector().queuedNextBallVel();
            const ActionEffector& M_effector=agent->effector();
            const PassMessage* mes=new PassMessage( teammate->unum(),pass_point ,M_effector.queuedNextBallPos(),ball_vel);
-           agent->addSayMessage(mes);     
-           
-         
-           
+           agent->addSayMessage(mes);
+           ((SamplePlayer*)agent)->lastRole="Passer";
              
-        }
+        
 
 }
 void runThrough(PlayerAgent * agent)
 {
 
-       const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
-       if(!M_pass.empty() && M_pass.front().receiver_==agent->world().self().unum() )
-            {    
+    const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
+    const WorldModel & wm = agent->world();
+     
+    if (  wm.audioMemory().pass().empty()
+         || wm.audioMemory().pass().front().receiver_ != wm.self().unum()
+         || ((SamplePlayer*)agent)->lastRole=="Passer")
+    {
+        return ;
+    }
 
-            const double dash_power = Strategy::get_normal_dash_power( agent->world() );
-            double distance= agent->world().ball().pos().dist(agent->world().self().pos());
-                   
-            Body_GoToPoint(agent->effector().queuedNextBallPos(), 1, dash_power).
-            execute( agent );
-/*           Vector2D ball_vel( 0.0, 0.0 );
-           Vector2D ball_pos(0.0,0.0);
-           const ActionEffector& M_effector=agent->effector();
-           ball_vel = M_effector.queuedNextBallVel();
-           ball_pos=M_effector.queuedNextBallPos();*/
-          
-          // 
-            }
+    const double dash_power = Strategy::get_normal_dash_power( agent->world() );
+    double distance= agent->world().ball().pos().dist(agent->world().self().pos());
+    Body_GoToPoint(agent->effector().queuedNextBallPos(), 1, dash_power).execute( agent );
+    ((SamplePlayer*)agent)->lastRole="Receiver";
+    if( wm.self().isKickable())
+    {
+         ((SamplePlayer*)agent)->lastRole="Normal";
+
+    }         
 
 }
 SamplePlayer::SamplePlayer()
@@ -436,7 +430,7 @@ SamplePlayer::actionImpl()
         }
         role_ptr->execute( this );
         return;
-    }
+    } 
 
     //
     // play_on mode
@@ -466,11 +460,12 @@ SamplePlayer::actionImpl()
             kickable = false;
         }
 
-      // takePass(this,wm.self().unum(),1);//world().teammatesFromSelf().front()->unum());
+      /// givePass(this,wm.self().unum(),1);//world().teammatesFromSelf().front()->unum());
+       //    makeDribble(this,Vector2D(-10,0),world().self().unum(),1);
         if ( kickable )
         {
-      giveThrough(this,wm.self().unum(),10);
-	   
+          //   giveThrough(this,wm.self().unum(),10);
+	       givePass(this,wm.self().unum(),wm.teammatesFromSelf().front()->unum());
             //Bhv_BasicMove().execute(this);
           //  Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
@@ -826,7 +821,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //defence function and replace it with your own.
     //------------xx------------//
       
-   //  takePass(this,passer,(passer==11)?2:passer+1);
+   //  givePass(this,passer,(passer==11)?2:passer+1);
     
     // I have the ball, what to do?
   //   const PlayerPtrCont & team = wm.teammatesFromSelf();
@@ -835,18 +830,29 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //makeDribble(this,Vector2D(-10,0),8,0.5);
     setNeckAction( new Neck_TurnToBall() );
     Bhv_BodyNeckToBall().execute(this);
-   if(!agent->world().audioMemory().pass().empty() )
+
+    if(!world().audioMemory().pass().empty() )
  
     {  
-      cout<<"Pass Count: For"<<world().self().unum()<<" is "<<agent->world().audioMemory().pass().front().receiver_<<"  $"<<endl;
+   
+      
+      if(world().audioMemory().pass().front().receiver_!=world().self().unum())
+      {
+       #ifdef MYDEBUG 
+       cout<<"\rPass Count: For"<<world().self().unum()<<" is "<<world().audioMemory().pass().front().receiver_<<"  $";
+       cout<<world().self().unum()<<" is "<<lastRole<<"  $"<<endl;
+       #endif
+
+        lastRole="Normal";
+      }      
 
     }
-
+        //makeDribble(this,Vector2D(-10,0),world().self().unum(),1);
     if ( kickable && !Opponenthasball)
     {
      //    doKick( this);
-      //  takePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
-         giveThrough(this,world().self().unum(),10);
+        givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
+      //   giveThrough(this,world().self().unum(),10);
 
         
     }
@@ -857,8 +863,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
         
          
           //   doMove(this);
-
-        
+       
           runThrough(this);
         }
 
