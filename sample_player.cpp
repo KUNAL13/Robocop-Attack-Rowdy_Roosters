@@ -1,4 +1,5 @@
 
+
 /*
  *Copyright:
 
@@ -47,7 +48,7 @@
 #include "bhv_set_play.h"
 #include "bhv_set_play_kick_in.h"
 #include "bhv_set_play_indirect_free_kick.h"
-#include "bhv_basic_move.h" 
+#include "bhv_basic_move.h"
 
 #include "bhv_custom_before_kick_off.h"
 #include "bhv_strict_check_shoot.h"
@@ -63,10 +64,10 @@
 #include <rcsc/action/body_smart_kick.h>
 #include <rcsc/action/body_kick_one_step.h>
 #include <rcsc/action/body_kick_to_relative.h>
- 
+
 #include <rcsc/action/neck_scan_field.h>
 #include <rcsc/action/neck_turn_to_ball_or_scan.h>
-#include <rcsc/action/neck_turn_to_point.h> 
+#include <rcsc/action/neck_turn_to_point.h>
 #include <rcsc/action/view_synch.h>
 #include <rcsc/action/body_hold_ball.h>
 #include <rcsc/action/body_dribble.h>
@@ -78,7 +79,7 @@
 #include <rcsc/player/audio_sensor.h>
 #include <rcsc/player/freeform_parser.h>
 #include <rcsc/player/debug_client.h>
- 
+
 #include "bhv_chain_action.h"
 #include <rcsc/action/body_advance_ball.h>
 #include <rcsc/action/body_dribble.h>
@@ -102,9 +103,9 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <vector> 
-#include <algorithm> 
-#include <queue>  
+#include <vector>
+#include <algorithm>
+#include <queue>
 #define DEBUG_PRINT
 using namespace rcsc;
 using namespace std;
@@ -114,7 +115,7 @@ using namespace std;
  */
 #define DEBUGDRAW
 const string ATTACK_FORMATION_CONF = "offense-formation.conf";
-//followDribbler 
+//followDribbler
 Formation::Ptr o_formation;
 vector<Vector2D > p_positions;
 double slope(double x1,double y1,double x2,double y2);
@@ -126,7 +127,7 @@ pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D p
             if(point2.x!=circle.x)
             {
             double m_=slope(circle.x,circle.y,point2.x,point2.y);
-            double c_=circle.y-(m_*circle.x);        
+            double c_=circle.y-(m_*circle.x);
             roots.first.x=circle.x+sqrt(pow(r_,2)/(1+pow(m_,2)));
             roots.second.x=circle.x-sqrt(pow(r_,2)/(1+pow(m_,2)));
             roots.first.y=m_*roots.first.x+c_;
@@ -139,7 +140,7 @@ pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D p
                 roots.first.y=circle.x+r_;
                 roots.second.y=circle.x-r_;
             }
-            
+
 
 
 }
@@ -147,12 +148,12 @@ pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D p
 pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D point1,Vector2D point2)
 {
             pair<Vector2D,Vector2D> roots;
-          
+
             double r_=radius;
             if(point2.x!=point1.x)
             {
             double m_=slope(point1.x,point2.y,point2.x,point2.y);
-            double c_=circle.y-(m_*circle.x);    
+            double c_=circle.y-(m_*circle.x);
             double a_ =(1+m_*m_);
             double b_ = -2*circle.x+2*m_*c_-2*circle.y*m_;
             double C_ = circle.x*circle.x+ pow((c_-circle.y),2) - r_*r_;
@@ -161,7 +162,7 @@ pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D p
 
             if(delta>=0)
             {
-            
+
             roots.first.x=(-b_+sqrt(delta))/(2*a_);
             roots.second.x=(-b_-sqrt(delta))/(2*a_);
             roots.first.y=m_* roots.first.x+c_;
@@ -182,7 +183,7 @@ pair<Vector2D,Vector2D> interceptPoints(Vector2D circle,double radius,Vector2D p
                 roots.second.y=circle.y-sqrt(r_*r_-pow((circle.x-point1.x),2) ) ;
             }
             return roots;
-            
+
 
 
 }
@@ -211,163 +212,500 @@ double getHoldProbe(PlayerAgent* agent)
 }
 void makeAttack(PlayerAgent* agent)
 {
+    if(passAttack(agent))
+      cout<<"Passing... "<<endl;
+    else
     if(dribbleAttack(agent))
     {
         cout<<"Dribbling..."<<endl;
     }
-    else if(passAttack(agent))
-        cout<<"Passing... "<<endl;
+
     else return;
 
 }
+pair<Vector2D,double> get_safe_point(Vector2D ball_point,int angle_start,int angle_end,int angle_thr,double sector_radius,vector<Vector2D> opponentslist,PlayerAgent * agent,int recr_steps)
+{
+
+    double discount_factor=0.9;
+    vector<Vector2D> relative_opponentslist;
+    pair<Vector2D,double> best_point;
+    if(sector_radius>6)    
+    best_point.second=0;
+    else
+    best_point.second=-1000000000;    
+    best_point.first=ServerParam::i().theirTeamGoalPos();
+    //cout<<"000000000000000000000000000000 step number"<<recr_steps<<endl;
+    if(recr_steps==0)
+    {
+        best_point.second=0;
+        return best_point;
+    }    
+    for(int i=angle_start;i<angle_end;i=i+angle_thr) // itterating clockwise
+    {
+        //cout<<"current  angle is"<<i<<endl;
+        const Sector2D sector( ball_point,0, sector_radius,i ,i+angle_thr);
+        if( agent->world().existOpponentIn( sector, 10, false ) )
+           {
+               // cout<<"opponent is at "<<i<<endl;
+             continue;
+           }
+        Vector2D temp_point;
+        temp_point.x=ball_point.x + sector_radius*cos(AngleDeg::DEG2RAD*(i+angle_thr/2));
+        temp_point.y=ball_point.y + sector_radius*sin(AngleDeg::DEG2RAD*(i+angle_thr/2));
+        double opponent_max_move=ball_point.dist(temp_point)/(agent->world().ball().vel().r())*ServerParam::i().defaultPlayerSpeedMax();        
+        //cout<<"ok1   "<<opponentslist.size()<<endl;
+        relative_opponentslist.clear();
+        for(int j=0;j<opponentslist.size();j++)
+        {
+            Line2D temp_line(temp_point,opponentslist[i]);
+            double temp_angle;
+            if(temp_line.getB()!=0)
+            temp_angle=atan(-1*temp_line.getA()/temp_line.getB());
+            else
+            temp_angle=AngleDeg::PI/2;    
+            Vector2D temp_relative;
+            temp_relative.x=opponentslist[i].x+opponent_max_move*cos(temp_angle+AngleDeg::PI);
+            temp_relative.y=opponentslist[i].y+opponent_max_move*sin(temp_angle+AngleDeg::PI);
+            relative_opponentslist.push_back(temp_relative);
+        }
+        //cout<<"ok1"<<endl;
+        Vector2D close_opponent=opponentslist[0];
+        for(int j=0;j<opponentslist.size();j++)
+        {
+            if(temp_point.dist(opponentslist[i])<temp_point.dist(close_opponent))
+                close_opponent=opponentslist[i];
+        }
+        //cout<<"ok1"<<endl;
+        double safety_value=temp_point.dist(close_opponent)
+        +discount_factor*get_safe_point(temp_point,angle_start,angle_end,angle_thr,sector_radius,relative_opponentslist,agent,recr_steps-1).second;
+        //cout<<"safety is equal"<<safety_value<<"  "<<i<<endl;
+        if(best_point.second<safety_value)
+        {
+            best_point.second=safety_value;
+            best_point.first=temp_point;
+        }   
+
+    }
+    return best_point;
+}
 bool dribbleAttack(PlayerAgent * agent)
 {
-    
+
 
     int ball_step = agent->world().interceptTable()->opponentReachCycle();
     const WorldModel& wm=agent->world();
-    
+
     const Vector2D ball_pos=wm.ball().pos();
-    int dist_thr=10;
+
     Vector2D desered_point=ServerParam::i().theirTeamGoalPos();
     PlayerPtrCont  dangerousPlayers;
 
     const PlayerPtrCont opp=wm.opponentsFromSelf();
-   
+
     if(opp.empty())
     {
         makeDribble(agent,desered_point,wm.self().unum(),1);
-        
+
         return true;
     }
 
 
     if(opp.size()>=1)
     {
-        
-        const PlayerObject *Nopponent=wm.getOpponentNearestToSelf(20);
-        Sector2D ahead(wm.self().pos(),0, dist_thr,wm.self().body()-20 ,wm.self().body()+20);
-        if(!wm.existOpponentIn(ahead,dist_thr,true))
-        {
-              desered_point.y=wm.self().pos().y;
-              makeDribble(agent,desered_point,wm.self().unum(),0.65);
-              return true;
-        }
+
+        const PlayerObject *Nopponent=wm.getOpponentNearestToSelf(200);
+
         if(Nopponent->pos().dist(ball_pos)<=3)
         return false;
-        int dist_thr=8;
-        if(Nopponent->pos().dist(ball_pos)<=dist_thr)
-        {
-
-                   
-            AngleDeg target_angle=(Nopponent->pos()-wm.self().pos()).dir();
-            bool notFound=true;
-            Sector2D findSector (wm.self().pos(),0, dist_thr,target_angle,target_angle  );
-            double minDist=0;
-            for(int i=-90;i<=60;i+=30)
-            {
-           
-                const Sector2D sector( wm.self().pos(),0, dist_thr,i ,i+30);
-                if( !wm.existOpponentIn( sector, dist_thr, false ) )
-                {
-                    
-                    notFound=false;
-                    if(sector.center().dist(Nopponent->pos())>minDist)
-                    {
-                        minDist=sector.center().dist(Nopponent->pos());
-                        findSector=sector;
-                    }
-                    cout<<"Sector Found"<<endl;
-                }
-
-            }   
-            if(notFound==true)
-            return false;
-            else
-            {
-                  cout<<Nopponent->unum()<<endl;
-                  Line2D direction=Line2D(wm.self().pos(),findSector.center());
-                  makeDribble(agent,direction.projection(findSector.center()),wm.self().unum(),0.65);
-                  return true;
-            }
-
-        }
-        else
-        {
-     
-        
-        
-        
+        int ahead_thr=6;
         Vector2D goal_post1= desered_point;
         goal_post1.y-=ServerParam::i().goalWidth()/2;
         Vector2D goal_post2= desered_point;
         goal_post2.y+=ServerParam::i().goalWidth()/2;
+        AngleDeg goal_angle=(desered_point-wm.self().pos()).dir();
+        AngleDeg post1_angle=(goal_post1-wm.self().pos()).dir();
+        AngleDeg post2_angle=(goal_post2-wm.self().pos()).dir();
+        Sector2D ahead1(wm.self().pos(),0.5, ahead_thr,goal_angle-90 ,goal_angle+90);
+        
+        vector<Vector2D> opponentslist;
+        const PlayerPtrCont & opps = wm.opponentsFromSelf();
+        for ( PlayerPtrCont::const_iterator it = opps.begin();it != opps.end();++it )
+            opponentslist.push_back((*it)->pos());
 
-        Line2D upperBound=Line2D(ball_pos,goal_post1);
-        Line2D lowerBound=Line2D(ball_pos,goal_post2);
-        Line2D toGoalLine=Line2D(ball_pos,ServerParam::i().theirTeamGoalPos());
-
-         cout<<"Checking for all opponent ( "<<opp.size()<<" ) "<<endl;
-        for ( PlayerPtrCont::const_iterator it = opp.begin();it != opp.end();++it )
+        if(!wm.existOpponentIn(ahead1,10,false))
         {
-     
-           
+            cout<<"far case is running ---"<<endl;
+          //    desered_point.y=wm.self().pos().y;
 
-            if(  (*it)->unum()>=1 && (*it)->unum()<=11 
-            &&
-                 ( (upperBound.getA()*(*it)->pos().x) +
-                 ( upperBound.getB()* (*it)->pos().y) >=(upperBound.getC()-5) )
-           &&  ( (lowerBound.getA()*(*it)->pos().x) +
-                 ( lowerBound.getB()* (*it)->pos().y) <=(lowerBound.getC()+5) )
-                 )
-            
-              { 
-
-                dangerousPlayers.push_back((*it));
-                cout<<"Player in a way "<<(*it)->unum()<<endl;
+              // makeDribble(agent,desered_point,wm.self().unum(),0.65);
+              // return true;
+                int recr_steps=3,angle_thr=20;
+                double sector_radius=7;
+                pair<Vector2D,double> safe_point=get_safe_point(wm.self().pos(),(int)post1_angle.degree(),(int)post2_angle.degree(),angle_thr,sector_radius,opponentslist,agent,recr_steps);
                 
-            }
-            if(dangerousPlayers.size()==1)
-            break;
-            
+                makeDribble(agent,safe_point.first,wm.self().unum(),0.85);
+                    return true;
+                /*Sector2D upperSector(wm.self().pos(),0.5,100,post1_angle,goal_angle);
+                Sector2D lowerSector(wm.self().pos(),0.5,100,goal_angle,post2_angle);
+
+                //cout<<"Checking for all opponent ( "<<opp.size()<<" ) "<<endl;
+                for ( PlayerPtrCont::const_iterator it = opp.begin();it != opp.end();++it )
+                {
+                  if( (upperSector.contains((*it)->pos()) )||(lowerSector.contains((*it)->pos()) ))
+                    {
+                        if((*it)->unum()>1)
+                        {
+                            dangerousPlayers.push_back((*it));
+                //            cout<<"Player in a way "<<(*it)->unum()<<endl;
+                        }
+
+                    }
+                    if(dangerousPlayers.size()==1)
+                    break;
+
+                }
+
+
+                Vector2D goal_pos=ServerParam::i().theirTeamGoalPos();
+                if(dangerousPlayers.empty())
+                {
+              //      cout<<"Safe Dribbling..."<<endl;
+                    if(opp[0]->distFromSelf()<=10)
+                        makeDribble(agent,goal_pos,wm.self().unum(),0.65);
+                    else
+                         makeDribble(agent,goal_pos,wm.self().unum(),0.65);
+                   return true;
+                }
+                if(dangerousPlayers.size()==1)
+                {
+
+                    PlayerObject* oppP=dangerousPlayers[0];
+                    if(lowerSector.contains((*oppP).pos()))
+                    {
+                        desered_point=goal_post1;
+                    }
+                    else
+                    {
+                        desered_point=goal_post2;
+                    }
+                //    cout<<"Ahead Dribbling..."<<endl;
+                    makeDribble(agent,desered_point,wm.self().unum(),0.65);
+                    return true;
+                }
+                */
         }
-
-
-        Vector2D goal_pos=ServerParam::i().theirTeamGoalPos();
-        if(dangerousPlayers.empty())
+       else
         {
-            if(opp[0]->distFromSelf()<=10)
-                makeDribble(agent,goal_pos,wm.self().unum(),0.65);
-            else
-                 makeDribble(agent,goal_pos,wm.self().unum(),0.85);
-           return true;
-        }
-        if(dangerousPlayers.size()==1)
-        {   
-            
-            PlayerObject* oppP=dangerousPlayers[0];
-            if( (toGoalLine.getA()*oppP->pos().x) + (toGoalLine.getB()*oppP->pos().y) >= toGoalLine.getC())
-            {
-                desered_point=goal_post1;
-            }
-            else
-                desered_point=goal_post2;
-            makeDribble(agent,desered_point,wm.self().unum(),0.65);
-            return true;
-        }
+                int angle_thr=40,angle_start=-90,angle_end=90;
+                int recr_steps=3;
+                double sector_radius=3;
+                //Sector2D ahead(wm.self().pos(),0, ahead_thr,-90 ,90);
+                
+                //cout<<"critical area entered..............."<<endl;
+                pair<Vector2D,double> safe_point=get_safe_point(wm.self().pos(),angle_start,angle_end,angle_thr,sector_radius,opponentslist,agent,recr_steps);
                
+                if(safe_point.second<0)
+                    return false;
+                else
+                {
+                   // cout<<wm.self().pos()<<" xxxxxxxxxxxxxx "<<safe_point.first<<endl;
+                    Line2D temp_line(safe_point.first,wm.self().pos());
+                    
+                    double temp_slope=-1*temp_line.getA()/temp_line.getB();
+                    printf("dircetion of dribbling is %lf\n",AngleDeg::RAD2DEG*atan(temp_slope));
+                    //cout<<"dircetion of dribbling is"<<AngleDeg::RAD2DEG*atan(temp_slope)<<endl;
+                    makeDribble(agent,safe_point.first,wm.self().unum(),0.65);
+                    return true;
+                }
+                /*
+                const PlayerPtrCont & opps = wm.opponentsFromSelf();
+                for ( PlayerPtrCont::const_iterator it = opps.begin();it != opps.end();++it )
+                {
+                     if(ahead.contains((*it)->pos()))
+                     {
+                        Nopponent=(*it);
+                      break;
+                     }
+                }
 
-    }
+                cout<<"Colsest Player is "<<Nopponent->unum()<<endl;
+                int dist_thr=6;
+                int angle_thr=15;
+                AngleDeg target_angle=(Nopponent->pos()-wm.self().pos()).dir();
+                bool notFound=true;
+                //Sector2D findSector;// (wm.self().pos(),0, dist_thr,target_angle,target_angle  );
+                AngleDeg farAngle=target_angle;
+                double minDist=0;
+                int temp_dir=-90;
+                for(int i=-90;i<=(90-angle_thr);i+=angle_thr)
+                {
+
+                    const Sector2D sector( wm.self().pos(),0, dist_thr,i ,i+angle_thr);
+                    AngleDeg newAngle=i+angle_thr/2;
+                    cout<<sector.center()<<" NewPoint "<<newAngle<<" "<<i<<endl;
+                     const Sector2D sector( wm.self().pos(),0, dist_thr,i ,i+angle_thr);
+                    if( !wm.existOpponentIn( sector, 10, false ) )
+                    {
+                        
+                      
+                        cout<<abs(newAngle.degree()-target_angle.degree())<<" "<<abs(farAngle.degree()-target_angle.degree());
+                        if(abs(newAngle.degree()-target_angle.degree())>abs(farAngle.degree()-target_angle.degree()))
+                        {
+
+                            notFound=false;
+                            farAngle=newAngle;
+                            temp_dir=i;
+                        }
+                   
+
+                    }
+                    else
+                    cout<<"opponent is at sector of angle"<<i<<endl;
+
+                }
+
+
+                if(notFound==true)
+                return false;
+                else
+                {
+                        cout<<"going at atatatatat"<<farAngle<<endl;                    
+
+
+                      cout<<Nopponent->unum()<<" Moving ..."<<" "<<temp_dir<<endl;
+                
+                      Line2D direction=Line2D(wm.ball().pos(),farAngle);
+                      Vector2D goal_point=ServerParam::i().theirTeamGoalPos();
+                      Vector2D goal_point2=goal_point;
+                      goal_point2.y=100;
+                      Line2D goalLine=Line2D(goal_point,goal_point2);
+                      cout<<direction.intersection(goalLine);
+                      makeDribble(agent,direction.intersection(goalLine),wm.self().unum(),0.65);
+                      return true;
+                }
+
+            */
+        }
+
 
    }
     return false;
 
 }
+
+Vector2D best_catching_point(Vector2D ball_pos,Vector2D player_pos,int thr,double ratio,double vel1,double vel2)
+{
+  Vector2D point,point2;
+  Line2D L1(ball_pos,thr);
+  Line2D direct_line(ball_pos,player_pos);
+// double t_1;
+//   if(L1.getB()!=0)
+//    t_1 = atan(-L1.getA()/L1.getB());
+//    else
+//     t_1=AngleDeg::PI/2;
+
+//   double t_2;
+//   if(direct_line.getB()!=0)
+//   t_2= atan(-direct_line.getA()/direct_line.getB());
+//   else
+//   t_2=AngleDeg::PI/2;
+
+
+//   AngleDeg alpha((t_1-t_2)*AngleDeg::RAD2DEG);
+  AngleDeg alpha(thr-(player_pos-ball_pos).dir().degree());
+
+  
+  AngleDeg beta(AngleDeg::RAD2DEG*asin(ratio*sin(alpha.radian()) ) );
+  AngleDeg beta2(180-beta.degree());
+  double d=ball_pos.dist(player_pos);
+  if((vel1*cos(alpha.radian()) - vel2*cos(beta.radian()))==0.0)
+   {
+        point.x=10000;
+        point.y=10000;
+        
+   } 
+   else
+   {
+        double dist_to_inter=vel1*d/(vel1*cos(alpha.radian()) - vel2*cos(beta.radian()));
+      point.x=ball_pos.x+dist_to_inter*cos(thr*AngleDeg::DEG2RAD);
+    point.y=ball_pos.y+dist_to_inter*sin(thr*AngleDeg::DEG2RAD);
+  
+   }
+  
+
+  
+  if((vel1*cos(alpha.radian()) - vel2*cos(beta2.radian()))==0.0)
+   {
+        point2.x=10000;
+        point2.y=10000;
+        
+   }
+   else
+   {
+        double dist_to_inter=vel1*d/(vel1*cos(alpha.radian()) - vel2*cos(beta2.radian()));
+        point2.x=ball_pos.x+dist_to_inter*cos(thr*AngleDeg::DEG2RAD);
+        point2.y=ball_pos.y+dist_to_inter*sin(thr*AngleDeg::DEG2RAD);
+  
+   } 
+  
+  //Line2D L2(player_pos,beta);
+
+// passing point for current player
+  //if(L1.getA()/L1.getB() == L2.getA()/L2.getB())
+   // cout<<"Alpha "<<alpha.degree()<<endl;
+   // cout<<"Beta "<<beta.degree()<<endl;
+   // cout<<"Beta2 "<<beta2.degree()<<endl;
+
+   
+
+  //point=L1.intersection(L2);
+   if(ball_pos.dist(point)<ball_pos.dist(point2))
+  return point;
+    else
+        return point2;
+}
+
+class POINTS
+{
+public:
+    double dis;
+    int player_num;
+    Vector2D tackle_point; 
+};
+struct Comp{
+        bool operator()(const POINTS& a, const POINTS& b){
+            return a.dis<b.dis;
+        }
+    };
+bool passAttack(PlayerAgent* agent)
+{
+  const double ratio=ServerParam::i().ballSpeedMax()/(ServerParam::i().defaultPlayerSpeedMax());
+  const double vel1=ServerParam::i().ballSpeedMax();
+  const double vel2=(ServerParam::i().defaultPlayerSpeedMax());
+  const WorldModel& wm=agent->world();
+
+  //const PlayerPtrCont & opps = wm.opponentsFromSelf();
+  //const PlayerPtrCont & ours = wm.teammatesFromSelf();
+  const PlayerPtrCont & opps = (const PlayerPtrCont &)wm.theirPlayers();
+    const PlayerPtrCont & ours = (const PlayerPtrCont &)wm.ourPlayers();
+  AngleDeg angle_thr(10);
+  Vector2D ball_pos=wm.ball().pos();
+
+  PlayerObject *bestPlayer=NULL;
+  // if(opps.size()==0)
+  // {
+  //     bestPlayer=passPriority.top().second;
+  //     givePass(agent,agent->world().self().unum(),bestPlayer->unum());
+  //     return true;
+  // }
+
+  bool canPass=false;
+  Vector2D pass_point;
+  int f_lenght=ServerParam::i().pitchHalfLength();
+  int f_width=ServerParam::i().pitchHalfWidth();
+  cout<<f_lenght<<" pitch  "<<f_width<<endl;
+  cout<<"ballllll"<<ball_pos<<endl;
+  // - +, + -
+  Rect2D field(Vector2D(-f_lenght,-f_width), Vector2D(f_lenght,f_width) ); 
+
+    
+    // typedef pair<int,Vector2D*> PLAYER;
+    // //typedef pair<int,Vector2D> PLAYER11;
+    // //priority_queue<PLAYER11> passPoints11;
+    // typedef pair<double, PLAYER > POINTS;
+    // typedef pair<double, Vector2D* > OPPO;
+    priority_queue<POINTS,vector<POINTS>,Comp> passPoints;
+
+
+for(int i=0;i<180;i+=angle_thr.degree())
+  {
+    priority_queue<POINTS,vector<POINTS>,Comp> red_points;
+    for ( PlayerPtrCont::const_iterator it = opps.begin();it != opps.end();++it )
+    {
+
+
+        Vector2D red_point=best_catching_point(ball_pos,(*it)->pos(),i,ratio,vel1,vel2);
+       // cout<<"player  "<<(*it)->unum()<<"tackles at   "<<red_point<<"present at "<<(*it)->pos()<<endl;
+        //if(field.contains( red_point) )
+        if(red_point.x<f_lenght && red_point.x>-1*f_lenght &&red_point.y<f_width &&red_point.y>-1*f_width )
+        {
+            //cout<<" inside field"<<endl;
+        double distance_ball=red_point.dist(ball_pos);
+        POINTS current;
+        current.dis=-distance_ball;
+        current.tackle_point=red_point;
+        current.player_num=(*it)->unum();
+        red_points.push(current);
+        }
+
+        // else
+        // {
+        //    // cout<<" outside field"<<endl;
+        //     ;
+        // }
+      //   if(!red_points.empty())
+      // cout<<"Tackle Point is "<<*(red_points.top().second)<<" and "<<i<<endl;
+
+    }
+
+    // if(!red_points.empty())
+    // {
+    //     cout<<"for direction  "<<i<<"  opponent can tackle  "<<*(red_points.top().second)<<endl;
+    // }
+    // else
+    // {
+    //     cout<<"for direction  "<<i<<" 000000000000no opponent can tackle"<<endl;
+    // }
+    for ( PlayerPtrCont::const_iterator it = ours.begin();it != ours.end();++it )
+    {
+          Vector2D oppGoalpost=ServerParam::i().theirTeamGoalPos();
+          Vector2D closest_opp_point;
+          if(!red_points.empty())
+        closest_opp_point  =red_points.top().tackle_point;
+
+          Vector2D blue_point=best_catching_point(ball_pos,(*it)->pos(),i,ratio,vel1,vel2);
+          // cout<<"player  "<<(*it)->unum()<<"tackles at   "<<blue_point<<"present at "<<(*it)->pos()<<endl;
+          // cout<<"closeset opponent"<<(closest_opp_point)<<"   "<<red_points.top().player_num<<endl;
+          // if(field.contains(blue_point))
+          // cout<<(*it)->unum()<<" is catching point"<<blue_point<<endl;
+
+          if( (red_points.empty()||(  blue_point.dist(ball_pos)<closest_opp_point.dist(ball_pos)))
+           && blue_point.x<f_lenght && blue_point.x>-1*f_lenght &&blue_point.y<f_width &&blue_point.y>-1*f_width )
+          {
+            if( blue_point.x<f_lenght && blue_point.x>-1*f_lenght && blue_point.y<f_width && blue_point.y>-1*f_width )
+              {
+            double distance_goal=blue_point.dist(oppGoalpost);
+            POINTS current;
+            current.dis=-distance_goal;
+            current.player_num=(*it)->unum();
+            current.tackle_point=blue_point;
+            passPoints.push(current);
+          }
+          }
+    }
+  }
+  if(!passPoints.empty())
+  {
+
+
+        AngleDeg a=((passPoints.top().tackle_point)-ball_pos).dir();
+        cout<<"Best Player of  is "<<passPoints.top().player_num<<" Point "<<((passPoints.top().tackle_point))<<" "<<a<<endl;
+        givePass(agent,agent->world().self().unum(),passPoints.top().player_num,ServerParam::i().ballSpeedMax()*0.7,((passPoints.top().tackle_point)));
+        return true;
+  }
+
+  return false;
+
+
+}
+
+
+
 /*
 bool passAttack(PlayerAgent * agent)
-{  
-   
-    
+{
+
+
     const double max_speed_ballplayer=ServerParam::i().ballSpeedMax()/ServerParam::i().defaultPlayerSpeedMax();
 
     const WorldModel& wm=agent->world();
@@ -376,8 +714,8 @@ bool passAttack(PlayerAgent * agent)
     const AbstractPlayerCont & opps = wm.theirPlayers();
     const AbstractPlayerCont & ours = wm.ourPlayers();
     typedef pair<double,const AbstractPlayerObject *> PLAYER;
-    
- 
+
+
     Vector2D nearest_pos(0,0);
     const AbstractPlayerObject *bestPlayer=NULL;
     bool canPass=false;
@@ -385,27 +723,27 @@ bool passAttack(PlayerAgent * agent)
     priority_queue<PLAYER> passPriority;
     vector<Line2D> oppCaptured;
     vector<const AbstractPlayerObject *> oppP;
-    
+
     oppCaptured.push_back(Line2D(0,0,0));
     oppP.push_back(0);
-    
+
      for ( AbstractPlayerCont::const_iterator it = opps.begin();it != opps.end();++it )
         {
-           
-            double distf_ball=(double)(*it)->pos().dist(wm.ball().pos()); 
-           
+
+            double distf_ball=(double)(*it)->pos().dist(wm.ball().pos());
+
             Line2D connect=Line2D(ball_pos,(*it)->pos());
-            Vector2D interceptPoint=(ball_pos + (*it)->pos() ) /((1+max_speed_ballplayer)/max_speed_ballplayer); 
+            Vector2D interceptPoint=(ball_pos + (*it)->pos() ) /((1+max_speed_ballplayer)/max_speed_ballplayer);
 
             oppCaptured.push_back(Line2D(connect.getB(),-connect.getA(),connect.getB()*interceptPoint.y-connect.getB()*interceptPoint.x ));
             oppP.push_back((*it));
-        }    
+        }
 
     for ( AbstractPlayerCont::const_iterator it = ours.begin();it != ours.end();++it )
         {
             if((*it)->unum()==wm.self().unum())
                 continue;
-            double distf_goal=(*it)->pos().dist(ServerParam::i().theirTeamGoalPos()); 
+            double distf_goal=(*it)->pos().dist(ServerParam::i().theirTeamGoalPos());
             PLAYER current;
             current.first=-distf_goal;
             current.second=(*it);
@@ -416,12 +754,12 @@ bool passAttack(PlayerAgent * agent)
     while  (!passPriority.empty() && canPass==false)
     {
 
-    
+
          const AbstractPlayerObject* current=passPriority.top().second;
          const double pitchHWidth=ServerParam::i().pitchHalfWidth();
          const double pitchHLength=ServerParam::i().pitchHalfLength();
          Rect2D pitch=Rect2D(Vector2D(-pitchHLength,-pitchHWidth),Vector2D(pitchHLength,pitchHWidth));
-         Vector2D getPoint=(ball_pos + current->pos() ) /((1+max_speed_ballplayer)/max_speed_ballplayer); 
+         Vector2D getPoint=(ball_pos + current->pos() ) /((1+max_speed_ballplayer)/max_speed_ballplayer);
          Line2D connect=Line2D(ball_pos,current->pos());
          Line2D curr_line=Line2D(connect.getB(),-connect.getA(),connect.getA()*getPoint.y-connect.getB()*getPoint.x );
 
@@ -449,29 +787,29 @@ bool passAttack(PlayerAgent * agent)
         Vector2D opp_pos;
         Vector2D cur_pos=current->pos();
         Line2D opp_line=oppCaptured[i];
-       
+
         Vector2D inP=curr_line.intersection(opp_line),curr_line;
         if(!pitch.contains(inP))
         {
-            if( (opp_line.getA()*curr_line.x+opp_line.getB()*curr_line.y+opp_line.getC()>=0 ) 
-                
+            if( (opp_line.getA()*curr_line.x+opp_line.getB()*curr_line.y+opp_line.getC()>=0 )
+
             )
             {
                 canPass=false;
-          
+
                 cout<<"Can not give a pass to player "<<current->unum()<<endl;
-                 break;  
+                 break;
             }
             else
-                continue;  
+                continue;
         }
-     
-            
+
+
 
        if(inP.y>=cur_pos.y)
 
        {       remains=Segment2D(inP,remains.terminal());
-                
+
        }
        else
        {remains=Segment2D(remains.origin(),inP);
@@ -485,34 +823,34 @@ bool passAttack(PlayerAgent * agent)
         break;
         cout<<"\rCan not give a pass to player "<<current->unum()<<endl;
        }
-        
+
         if(i==11)
         {
             canPass=true;
             bestPlayer=current;
             pass_point=(remains.origin()+remains.terminal())/2;
-            cout<<remains.origin()<< " "<<remains.terminal()<<endl;  
+            cout<<remains.origin()<< " "<<remains.terminal()<<endl;
             break;
         }
 
          }
           if(canPass==false)
-        passPriority.pop(); 
+        passPriority.pop();
      }
     if(canPass)
     {
          cout<<endl<<"\rGiving Best Pass to Player "<<bestPlayer->unum()<<endl;
          double distance=(double) pass_point.dist(agent->world().self().pos());
-       
+
         givePass(agent,agent->world().self().unum(),bestPlayer->unum(),ServerParam::i().ballSpeedMax()*(distance/45),pass_point);
         return true;
     //    giveThrough(agent,bestPlayer->unum(),nearest_pos);
     }
-    
+
     //cout<<endl;
     return false;
 }*/
-bool passAttack(PlayerAgent * agent)
+/*bool passAttack(PlayerAgent * agent)
 {
     const double max_speed_ballplayer=ServerParam::i().ballSpeedMax()/ServerParam::i().defaultPlayerSpeedMax();
     const WorldModel& wm=agent->world();
@@ -582,7 +920,7 @@ bool passAttack(PlayerAgent * agent)
     double distance=wm.ball().pos().dist(bestPlayer->pos());
     givePass(agent,agent->world().self().unum(),bestPlayer->unum(),ServerParam::i().ballSpeedMax()*(distance/45));
     }
-}
+}*/
 
 Formation::Ptr  getFormation()
 {
@@ -629,19 +967,19 @@ void updatePositionOf(PlayerAgent* agent,Formation::Ptr formation)
      }
     formation->getPositions(ball_pos, p_positions );
 
-  
+
     if(p_positions[unum-1].x<=50 && p_positions[unum-1].x>=-50 )
     {  double maxDashPower=ServerParam::i().maxDashPower();
     #ifdef MYDEBUG
     cout<<"positions of "<<unum<<" is "<<p_positions[unum-1]<<endl;
     #endif
-       Body_GoToPoint( p_positions[unum-1], 1,maxDashPower ).execute( agent );      
-     }   
-    
+       Body_GoToPoint( p_positions[unum-1], 1,maxDashPower ).execute( agent );
+     }
 
-        
+
+
     //cout<<"positions of ball for "<<unum<<" is "<<formation->samples()>ball_<<endl;
-   
+
 }
 
 
@@ -672,7 +1010,7 @@ if(!receiver)return;
 
          if( agent->world().self().isKickable())
         {
- 
+
            double distance=(double) receiver_pos.dist(agent->world().self().pos());
            //double ballspeed=ServerParam::i().ballSpeedMax()/(distance/45); //sqrt(pow(agent->world().ball().vel().x,2)+pow(agent->world().ball().vel().y,2));
 
@@ -683,17 +1021,17 @@ if(!receiver)return;
            if ( ! agent->effector().queuedNextBallKickable() )
            ball_vel = agent->effector().queuedNextBallVel();
            ((SamplePlayer*)agent)->lastRole="Passer";
-           agent->addSayMessage(new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel));     
-       
+           agent->addSayMessage(new PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel));
+
            #ifdef MYDEBUG
            cout<<"Distance :"<<distance<<endl;
-           cout<<PassMessage( passReceiver,receiver_pos ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;
+           cout<<PassMessage( passReceiver,point ,agent->effector().queuedNextBallPos(),ball_vel).header()<<endl<<endl;
             #endif
 
         }
         }
 
-        
+
 }
 void givePass(PlayerAgent * agent ,int passTaker,int passReceiver,double ballspeed)
 {
@@ -704,8 +1042,15 @@ void givePass(PlayerAgent * agent ,int passTaker,int passReceiver,double ballspe
 
 }
 void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
-{   
-        if(!agent) 
+{
+     Body_Dribble( point,
+                      1.0,
+                      ServerParam::i().maxDashPower(),
+                      1
+                      ).execute( agent );
+     return;
+
+        if(!agent)
         return;
         if(agent->world().self().unum()==unum)
         {
@@ -716,11 +1061,11 @@ void makeDribble(PlayerAgent * agent ,Vector2D point,int unum,double power)
              Body_KickOneStep(point,power ).execute( agent);
             }
             else
-            Body_GoToPoint( agent->world().ball().pos(), power, 1).execute( agent ); 
-       
-        
+            Body_GoToPoint( agent->world().ball().pos(), power, 1).execute( agent );
+
+
         }
-         
+
 }
 
 void giveThrough(PlayerAgent * agent,int unum,double approxDist)
@@ -732,8 +1077,8 @@ void giveThrough(PlayerAgent * agent,int unum,double approxDist)
     if( !wm.self().isKickable())
     return;
       //   const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
-       
-         
+
+
             Vector2D pass_point(0.0,0.0);
            pass_point=teammate->pos()+Vector2D(approxDist,0.0);
             double ballspeed=ServerParam::i().ballSpeedMax();
@@ -747,8 +1092,8 @@ void giveThrough(PlayerAgent * agent,int unum,double approxDist)
            const PassMessage* mes=new PassMessage( teammate->unum(),pass_point ,M_effector.queuedNextBallPos(),ball_vel);
            agent->addSayMessage(mes);
            ((SamplePlayer*)agent)->lastRole="Passer";
-             
-        
+
+
 
 }
 /*
@@ -758,7 +1103,7 @@ double getDashPower(PlayerAgent* agent,bool max=false)
     const int self_reach = wm.interceptTable()->selfReachCycle();
     const int mate_reach = wm.interceptTable()->teammateReachCycle();
     const int opp_reach = wm.interceptTable()->opponentReachCycle();
-    
+
 }
 */
 void collectPass(PlayerAgent * agent)
@@ -766,7 +1111,7 @@ void collectPass(PlayerAgent * agent)
 
     const vector<AudioMemory::Pass>& M_pass=agent->world().audioMemory().pass();
     const WorldModel & wm = agent->world();
-     
+
     if (     M_pass.empty()
         ||   M_pass.front().receiver_ != wm.self().unum()
          || ((SamplePlayer*)agent)->lastRole=="Passer")
@@ -782,13 +1127,13 @@ void collectPass(PlayerAgent * agent)
 
 
     Body_GoToPoint(collect_pos, 1, dash_power).execute( agent );
-  
+
     ((SamplePlayer*)agent)->lastRole="Receiver";
     if( wm.self().isKickable())
     {
          ((SamplePlayer*)agent)->lastRole="Normal";
 
-    }         
+    }
 }
 void runThrough(PlayerAgent * agent)
 {
@@ -992,7 +1337,7 @@ SamplePlayer::actionImpl()
         }
         role_ptr->execute( this );
         return;
-    } 
+    }
 
     //
     // play_on mode
@@ -1008,7 +1353,7 @@ SamplePlayer::actionImpl()
     }
 
     if ( world().gameMode().type() == GameMode::KickOff_)
-    {   
+    {
         o_formation=getFormation();
         mpIntransit = false;
         if(wm.self().unum()==10){
@@ -1017,6 +1362,7 @@ SamplePlayer::actionImpl()
 
 
         }
+
         bool kickable = this->world().self().isKickable();
         if ( this->world().existKickableTeammate()
              && this->world().teammatesFromBall().front()->distFromBall()
@@ -1029,17 +1375,24 @@ SamplePlayer::actionImpl()
        //    makeDribble(this,Vector2D(-10,0),world().self().unum(),1);
         if ( kickable )
         {
-          //   giveThrough(this,wm.self().unum(),10);
-            //makeAttack(this);
-	       givePass(this,wm.self().unum(),2);
+          //   giveThrough(this,wm.self().unum()ServerParam::i().defaultPlayerSpeedMax(),10);
+            makeAttack(this);
+            //cout<<ServerParam::i().ballSpeedMax()<<" "<<ServerParam::i().defaultPlayerSpeedMax()<<endl;
+         /*  cout<<best_catching_point(Vector2D(-10.7,-12.12),Vector2D(-16.59,-11.95),0,
+                ServerParam::i().ballSpeedMax()/ServerParam::i().defaultPlayerSpeedMax(),
+                ServerParam::i().ballSpeedMax(),
+                ServerParam::i().defaultPlayerSpeedMax())<<endl;*/
+                // cout<<(Vector2D(-10.7,-12.12)-Vector2D(-16.59,-11.95)).dir().degree()<<endl;
+        
+         //  givePass(this,wm.self().unum(),2);
             //Bhv_BasicMove().execute(this);
           //  Bhv_BasicOffensiveKick().execute(this);
         //    if(!PassToBestPlayer( this )){
         //        Body_HoldBall().execute( this );
             //    doKick( this);
                 //Bhv_BasicOffensiveKick().execute(this);
-               // PassToBestPlayer(this);   
-            //f}                
+               // PassToBestPlayer(this);
+            //f}
         }
         else
         {
@@ -1241,14 +1594,14 @@ SamplePlayer::SampleDribble( PlayerAgent * agent )
         return true;
     }
 
-    
+
     if ( nearest_opp_dist > 2.5 )
     {
         Body_HoldBall().execute( agent );
         agent->setNeckAction( new Neck_TurnToLowConfTeammate() );
         return true;
     }
-    
+
 
     {
         Body_AdvanceBall().execute( agent );
@@ -1258,7 +1611,7 @@ SamplePlayer::SampleDribble( PlayerAgent * agent )
     return true;
 }
 
-/*bool 
+/*bool
 SamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){
     const WorldModel & wm = agent->world();
 
@@ -1273,11 +1626,11 @@ SamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){
     Vector2D backhor = Vector2D(currentHole.x-20, currentHole.y);
     Vector2D upvert = Vector2D(currentHole.x, currentHole.y-20);
     Vector2D downvert = Vector2D(currentHole.x, currentHole.y+20);
-    
+
     double buffer = 2.5;
-    
+
     //TODO: Return true only if pass is advantageous
-    
+
     if( IsOccupiedForPassing(agent, frontup, buffer)||
         IsOccupiedForPassing(agent, frontdown, buffer)||
         IsOccupiedForPassing(agent, backup, buffer)||
@@ -1292,7 +1645,7 @@ SamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){
 
     /*
     const WorldModel & world = agent->world();
-    const PlayerPtrCont::const_iterator 
+    const PlayerPtrCont::const_iterator
     t_end = world.teammatesFromSelf().end();
     for ( PlayerPtrCont::const_iterator
               it = world.teammatesFromSelf().begin();
@@ -1301,11 +1654,11 @@ SamplePlayer::PassPlayersAvailable( PlayerAgent * agent ){
     {
         if(((*it)->pos().dist(world.ball().pos()))<=20.0){
             return false;
-        }  
+        }
     }
-    
-    
-    return false;   
+
+
+    return false;
 }
 */
 
@@ -1350,17 +1703,17 @@ SamplePlayer::ClosestPlayerToBall(PlayerAgent * agent){
 
 bool
 SamplePlayer::executeSampleRole( PlayerAgent * agent )
-{   
+{
     if(agent->config().teamName()=="opp"){
         Body_GoToPoint( Vector2D(-50,0), 0.0, ServerParam::i().maxDashPower(), -1, 4, true, 60).execute( agent );
         return true;
     }
-    
-    
+
+
     //Setting up of different flags.
 
     bool kickable = agent->world().self().isKickable();
-    
+
     // If there is a teammate who can kick the ball and who is closer to the ball than I am.
     if ( agent->world().existKickableTeammate()
          && agent->world().teammatesFromBall().front()->distFromBall()
@@ -1376,7 +1729,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     }
     else{};
         //Opponenthasball = true;
-    
+
 
     if(agent->world().existKickableOpponent()){
         Opponenthasball = true;
@@ -1387,9 +1740,9 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     //them with your own, similarly if you have taken defense, you need to comment out the existing
     //defence function and replace it with your own.
     //------------xx------------//
-      
+
    //  givePass(this,passer,(passer==11)?2:passer+1);
-    
+
     // I have the ball, what to do?
   //   const PlayerPtrCont & team = wm.teammatesFromSelf();
  //    const PlayerObject * nearest_team=team.front();
@@ -1399,20 +1752,20 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
     Bhv_BodyNeckToBall().execute(this);
 
     if(!world().audioMemory().pass().empty() )
- 
-    {  
-    
 
-      
+    {
+
+
+
       if(world().audioMemory().pass().front().receiver_!=world().self().unum())
       {
-       #ifdef MYDEBUG 
+       #ifdef MYDEBUG
        cout<<"\rPass Count: For"<<world().self().unum()<<" is "<<world().audioMemory().pass().front().receiver_<<"  $";
        cout<<world().self().unum()<<" is "<<lastRole<<"  $"<<endl;
        #endif
 
         lastRole="Normal";
-      }      
+      }
 
     }
 
@@ -1423,22 +1776,22 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
        //givePass(this,world().self().unum(),world().self().unum()==11?2:world().self().unum()+1);
       //   giveThrough(this,world().self().unum(),10);
      makeAttack(this);
-        
+
     }
 
     //This is for off the ball movement which attacking, where to go for passes etc.
     else if (!kickable && !Opponenthasball)
-    {   
-        
-         
-       doMove(this);
-      
-      // runThrough(this);    
-      /*   if(world().audioMemory().pass().empty())
+    {
+
+
+      // doMove(this);
+
+       runThrough(this);
+         if(world().audioMemory().pass().empty())
             updatePositionOf(agent,o_formation);
          else if(world().audioMemory().pass().front().receiver_!= world().self().unum())
-          updatePositionOf(agent,o_formation);*/
-        
+          updatePositionOf(agent,o_formation);
+    
 
 
   }
@@ -1459,14 +1812,14 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
             agent->debugClient().addMessage( "ChainAction" );
             return true;
             }
-		          
+
             Bhv_BasicOffensiveKick().execute( agent );
             return true;
 
             }
 
         // I don't have the ball, opponent has it, off the ball movement while defending.
-        //falling back etc.     
+        //falling back etc.
         else if (!kickable && Opponenthasball){
             Bhv_BasicMove().execute(agent);
         }
@@ -1485,7 +1838,7 @@ SamplePlayer::executeSampleRole( PlayerAgent * agent )
 void
 SamplePlayer::doKick( PlayerAgent * agent )
 {
-    
+
     if ( Bhv_ChainAction().execute( agent ) )
     {
         return;
@@ -1510,12 +1863,12 @@ SamplePlayer::doMove( PlayerAgent * agent )
 bool
 SamplePlayer::BasicMove(PlayerAgent * agent){
     const WorldModel & wm = agent->world();
-    
+
     //-----------------------------------------------
     // tackle
-    
+
     if ( Bhv_BasicTackle( 0.8, 80.0 ).execute( agent ) )
-    {   
+    {
         return true;
     }
 
@@ -1535,14 +1888,14 @@ SamplePlayer::BasicMove(PlayerAgent * agent){
     {
         std::cout<<"body intercept called for player - "<<wm.self().unum()<<std::endl;
 
-    
+
         dlog.addText( Logger::TEAM,
                       __FILE__": intercept");
         Body_Intercept().execute( agent );
         agent->setNeckAction( new Neck_OffensiveInterceptNeck() );
         return true;
     }
-    
+
     //Check if ball has been passed
     /*
     if(wm.existKickableTeammate()){
@@ -1557,14 +1910,14 @@ SamplePlayer::BasicMove(PlayerAgent * agent){
         //Opponenthasball=false;
     }
     */
-    
+
     const Vector2D target_point = Vector2D(0,0);
     const double dash_power = ServerParam::i().maxDashPower();
 
     double dist_thr = wm.ball().distFromSelf() * 0.1;
     if ( dist_thr < 1.0 ) dist_thr = 1.0;
 
-    
+
 
     if ( wm.existKickableOpponent()
          && wm.ball().distFromSelf() < 18.0 )
@@ -1607,7 +1960,7 @@ SamplePlayer::isKickable(PlayerAgent * agent, int unum){
     }
 }
 
-bool 
+bool
 SamplePlayer::AreSamePoints(Vector2D A, Vector2D B, double buffer){
     //Check if and b are the same points +/- buffer
     if(A.dist(B)<buffer)
@@ -1615,7 +1968,7 @@ SamplePlayer::AreSamePoints(Vector2D A, Vector2D B, double buffer){
     return false;
 }
 
-double 
+double
 SamplePlayer::abs(double d){
     if (d>0.00)
         return d;
@@ -1634,7 +1987,7 @@ SamplePlayer::AreSameNos(double A, double B, double buffer){
 
 
 double DistanceBetweenPoints(double x1,double y1,double x2,double y2){
- 
+
         double distance = sqrt(pow((x1-x2),2)+pow((y1-y2),2));
 
         return distance;
@@ -1645,7 +1998,7 @@ double DistanceBetweenPoints(double x1,double y1,double x2,double y2){
     double AngleBetweenPoints(double x1,double y1,double x2,double y2,double x3,double y3){
 
         double angle = acos((pow(DistanceBetweenPoints(x1,y1,x2,y2),2)+pow(DistanceBetweenPoints(x1,y1,x3,y3),2)-pow(DistanceBetweenPoints(x2,y2,x3,y3),2))/(2*DistanceBetweenPoints(x1,y1,x2,y2)*DistanceBetweenPoints(x1,y1,x3,y3)));
-        
+
         return angle;
     }
 
@@ -1692,7 +2045,7 @@ double DistanceBetweenPoints(double x1,double y1,double x2,double y2){
     double intersecting_point_x(double c1, double c2, double a, double b){
 
         double x = ((c2*b - c1*a)/((a*a)+(b*b)));
-        
+
         return x;
     }
 
@@ -1701,14 +2054,14 @@ double DistanceBetweenPoints(double x1,double y1,double x2,double y2){
     double intersecting_point_y(double c1, double c2, double a, double b){
 
         double y = ((c2*a + c1*b)/((a*a)+(b*b)));
-        
+
         return y;
-    } 
+    }
 
     double angle_between_two_lines(const Line2D & line1,const Line2D & line2 ){
 
-        double theta_1 = atan(line1.getB()/line1.getA()); 
-    
+        double theta_1 = atan(line1.getB()/line1.getA());
+
         double theta_2 = atan(line2.getB()/line2.getA());
 
         return (theta_2-theta_1);
@@ -1908,7 +2261,7 @@ SamplePlayer::doPreprocess()
     // ball search
     // check queued intention
     // check simultaneous kick
-	
+
     const WorldModel & wm = this->world();
 
     dlog.addText( Logger::TEAM,
@@ -1927,7 +2280,7 @@ SamplePlayer::doPreprocess()
         this->setNeckAction( new Neck_TurnToBallOrScan() );
         return true;
     }
-    
+
 
     //
     // BeforeKickOff or AfterGoal. jump to the initial position
@@ -1946,7 +2299,7 @@ SamplePlayer::doPreprocess()
     //
     // self localization error
     //
-    
+
     if ( ! wm.self().posValid() )
     {
         dlog.addText( Logger::TEAM,
@@ -1954,12 +2307,12 @@ SamplePlayer::doPreprocess()
         Bhv_Emergency().execute( this ); // includes change view
         return true;
     }
-    
+
 
     //
     // ball localization error
     //
-    
+
     const int count_thr = ( wm.self().goalie()
                             ? 10
                             : 5 );
@@ -1973,7 +2326,7 @@ SamplePlayer::doPreprocess()
         Bhv_NeckBodyToBall().execute( this );
         return true;
     }
-    
+
 
     //
     // set default change view
@@ -1984,7 +2337,7 @@ SamplePlayer::doPreprocess()
     //
     // check shoot chance
     //
-    
+
     if ( doShoot() )
     {
 
@@ -1993,14 +2346,14 @@ SamplePlayer::doPreprocess()
 
         return true;
     }
-    
+
 
     //
     // check queued action
     //
-    
+
     if ( this->doIntention() )
-    {   
+    {
         #ifdef MYDEBUG
         std::cout<<"doIntention------------------------------------------------------------"<<std::endl;
         std::cout<<"*******************************************************************************"<<std::endl;
@@ -2013,19 +2366,19 @@ SamplePlayer::doPreprocess()
     //
     // check simultaneous kick
     //
-    
+
     if ( doForceKick() )
-    {   
+    {
         std::cout<<"doForceKick--------------------------------------------------------------"<<std::endl;
         std::cout<<"*******************************************************************************"<<std::endl;
         return true;
     }
-    
+
 
     //
     // check pass message
     //
-    
+
     if ( doHeardPassReceive() )
     {
         #ifdef MYDEBUG
@@ -2034,7 +2387,7 @@ SamplePlayer::doPreprocess()
           #endif
         return true;
     }
-    
+
 
     return false;
 }
@@ -2254,4 +2607,3 @@ SamplePlayer::createActionGenerator() const
 
     return ActionGenerator::ConstPtr( g );
 }
-
